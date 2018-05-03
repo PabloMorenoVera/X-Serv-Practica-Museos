@@ -1,16 +1,22 @@
 from django.db import models
 
 # Create your models here.
-class Comentario(models.Model):
-    id_museo = models.IntegerField()
-    texto = models.TextField(null=True, blank=True)
-    usuario = models.CharField(max_length=128)
-    def __str__(self):
-        return self.usuario
-
 class Museo(models.Model):
-    id_museo = models.IntegerField()
-    usuario = models.CharField(max_length = 128)
-    comentarios = models.ForeignKey(Comentario)
+    nombre = models.CharField(max_length=128)
+    distrito = models.CharField(max_length=128)
+    url = models.URLField(max_length=200)
     def __str__(self):
-        return self.usurio
+        return self.nombre
+
+class Usuario(models.Model):
+    nombre = models.CharField(max_length=128)
+    museos = models.ManyToManyField(Museo)
+    def __str__(self):
+        return self.nombre
+
+class Comentario(models.Model):
+    texto = models.TextField(null=True, blank=True)
+    usuario = models.ForeignKey(Usuario)
+    museo = models.ForeignKey(Museo)
+    def __str__(self):
+        return self.texto
