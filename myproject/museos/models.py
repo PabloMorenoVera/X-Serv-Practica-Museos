@@ -11,6 +11,8 @@ class Museo(models.Model):
 class Usuario(models.Model):
     nombre = models.CharField(max_length=128)
     museos = models.ManyToManyField(Museo)
+    letra = models.CharField(max_length=64)
+    color = models.CharField(max_length=32)
     def __str__(self):
         return self.nombre
 

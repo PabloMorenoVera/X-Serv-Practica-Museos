@@ -20,7 +20,15 @@ from django.views.static import serve
 from django.views.generic import RedirectView
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^$', 'museos.views.home'),
     url(r'^logout', logout),
     url(r'^login', login),
+    url(r'^admin/', include(admin.site.urls)),
+    url(r'^xml$', 'museos.views.get_xml'),
+    url(r'^museos$', 'museos.views.listar'),
+    url(r'^usuarios$', 'museos.views.listar'),
+    url(r'^museos/(\d+)$', 'museos.views.mostrar_museo'),
+    url(r'^accounts/profile/', RedirectView.as_view(url='/', permanent=True)),
+    url(r'^(\w+)$', 'museos.views.usuario'),
+    url(r'^(\w+)/xml$', 'museos.views.mostrar_xml')
 ]

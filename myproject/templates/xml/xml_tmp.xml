@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Contenidos>
+    <infoDataset>
+        <nombre>Museos del usuario {{ nombre }}</nombre>
+        <descripcion> Datos de los Museos favoritos del usuario.
+     </descripcion>
+    </infoDataset>
+    {% for museo in museos %}
+      <contenido>
+          <tipo>EntidadesYOrganismos</tipo>
+          <atributos idioma="es">
+              <atributo nombre="ID-ENTIDAD">{{ museo.id }}</atributo>
+              <atributo nombre="NOMBRE">{{ museo.nombre }}</atributo>
+              <atributo nombre="CONTENT-URL">{{ museo.url }}</atributo>
+              <atributo nombre="LOCALIZACION">
+                  <atributo nombre="DISTRITO">{{ museo.distrito }}</atributo>
+              </atributo>
+              <atributo nombre="TIPO">/contenido/entidadesYorganismos/Museos</atributo>
+          </atributos>
+      </contenido>
+    {% endfor %}
+</Contenidos>
