@@ -20,7 +20,7 @@ import urllib.request
 ##  Entry.objects.all()[:5]
 ##  Entry.objects.all()[5:10]
 
-#Función para comprobar si un usuario está logueado.
+#Función para comprobar si un usuario está logueado
 def auth(request):
     if request.user.is_authenticated():
         logged = 'Logged in as ' + request.user.username + "    " + "<a href= '/logout'>Logout</a>"
@@ -28,14 +28,32 @@ def auth(request):
         logged = 'Not logged in.' + "<a href='/login'>Login</a>"
     return logged
 
+
 #Página principal "/"
-def home(request):
+def home(request, d1 = 0, d2 = 5):
     respuesta = "<ul>"
-    for listado in Museo.objects.all():
-        respuesta += "<li><a href= '" + str(listado.url) + "'>" + listado.nombre + '</a>'
+    if request.path == "/":
+        for listado in Museo.objects.all()[:5]:
+            respuesta += "<li><a href= '" + str(listado.url) + "'>" + listado.nombre + '</a>'
+
+    else:
+        if Museo.objects.all().count() < int(d1):
+            return HttpResponseNotFound("No hay más museos")
+        elif Museo.objects.all().count() < int(d2):
+            d2 = Museo.objects.all().count()
+
+        for listado in Museo.objects.all()[int(d1):int(d2)]:
+            respuesta += "<li><a href= '" + str(listado.url) + "'>" + listado.nombre + '</a>'
+
     respuesta += "</ul>"
+
+    j = 1
+    for i in range(0,int(round(Museo.objects.all().count()/5,0)+1)):
+        respuesta += "<a href='http://localhost:8000/" + str(i*5) + "-" + str(i*5+5) + "'>" + str(j) + "</a> "
+        j += 1
+
     logged = auth(request)
-    return HttpResponse(logged + "<br><br>Contenido de la base de datos:<br>" + respuesta)
+    return HttpResponse(logged + "<br><br><h1>Listado de Museos</h1>" + respuesta)
 
 
 def get_xml(request):

@@ -21,6 +21,7 @@ from django.views.generic import RedirectView
 
 urlpatterns = [
     url(r'^$', 'museos.views.home'),
+    url(r'^(\d+)-(\d+)', 'museos.views.home'),
     url(r'^logout', logout),
     url(r'^login', login),
     url(r'^admin/', include(admin.site.urls)),
