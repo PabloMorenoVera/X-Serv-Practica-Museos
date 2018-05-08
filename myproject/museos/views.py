@@ -15,10 +15,7 @@ from django.template import Context
 import urllib.parse
 import urllib.request
 
-
-### Entry.objects.all().filter(pub_date__year=2006)
-##  Entry.objects.all()[:5]
-##  Entry.objects.all()[5:10]
+from django.utils.datastructures import MultiValueDictKeyError
 
 #Función para comprobar si un usuario está logueado
 def auth(request):
@@ -28,38 +25,71 @@ def auth(request):
         logged = 'Not logged in.' + "<a href='/login'>Login</a>"
     return logged
 
+# Tengo que meter el value del hidden en la plantilla como una variable.
+form_accesibilidad = """
+<form action="" method="GET">
+    <input type="hidden" name="Accesible" value="1">
+    <input type="submit" value="Accesibles">
+</form>
+"""
+
+def mostrar_accesibles():
+    respuesta = "<ul>"
+    for listado in Museo.objects.filter(accesibilidad=1):
+        respuesta += "<li><a href= '" + str(listado.url) + "'>" + listado.nombre + '</a>'
+    respuesta += "</ul>"
+    logged = auth(request)
+    return HttpResponse(form_accesibilidad + logged + "<br><br><h1>Listado de Museos accesibles</h1>" + respuesta)
+
 
 #Página principal "/"
 def home(request, d1 = 0, d2 = 5):
     respuesta = "<ul>"
     if request.path == "/":
-        for listado in Museo.objects.all()[:5]:
-            respuesta += "<li><a href= '" + str(listado.url) + "'>" + listado.nombre + '</a>'
+        #Compruebo si está selecccionado el botón de accesibles
+        try:
+            accesible = request.GET["Accesible"]
+            museos_accesibles = Museo.objects.filter(accesibilidad=accesible)
+            if str(museos_accesibles) == "[]":
+                return HttpResponseNotFound (form_accesibilidad + "No hay museos accesibles")
+
+            for listado in museos_accesibles:
+                respuesta += "<li><a href='" + str(listado.url) + "'>" + listado.nombre + '</a>'
+
+        #Si no está seleccionado muestro los 5 primeros museos
+        except MultiValueDictKeyError:
+            for listado in Museo.objects.all()[:5]:
+                respuesta += "<li><a href= '" + str(listado.url) + "'>" + listado.nombre + '</a>'
 
     else:
-        if Museo.objects.all().count() < int(d1):
-            return HttpResponseNotFound("No hay más museos")
-        elif Museo.objects.all().count() < int(d2):
-            d2 = Museo.objects.all().count()
-
+        #Muestro los museos de la página que corresponde
         for listado in Museo.objects.all()[int(d1):int(d2)]:
             respuesta += "<li><a href= '" + str(listado.url) + "'>" + listado.nombre + '</a>'
 
     respuesta += "</ul>"
 
+    #Escribo las páginas con museos
     j = 1
     for i in range(0,int(round(Museo.objects.all().count()/5,0)+1)):
         respuesta += "<a href='http://localhost:8000/" + str(i*5) + "-" + str(i*5+5) + "'>" + str(j) + "</a> "
         j += 1
 
+    #Añado la autenticación
     logged = auth(request)
-    return HttpResponse(logged + "<br><br><h1>Listado de Museos</h1>" + respuesta)
+    return HttpResponse(form_accesibilidad + logged + "<br><br><h1>Listado de Museos</h1>" + respuesta)
 
-
+#Descargo el xml de la página
 def get_xml(request):
     xml = urllib.request.urlopen("https://datos.madrid.es/portal/site/egob/menuitem.ac61933d6ee3c31cae77ae7784f1a5a0/?vgnextoid=00149033f2201410VgnVCM100000171f5a0aRCRD&format=xml&file=0&filename=201132-0-museos&mgmtid=118f2fdbecc63410VgnVCM1000000b205a0aRCRD&preview=full")
     return HttpResponse(xml, content_type='text/xml')
 
+
+formulario = """
+<form action="" method="GET">
+    <input type="text" name="Distrito" value=""><br>
+    <input type="submit" value="Enviar">
+</form>
+"""
 
 # Muestro el listado de museos o usuarios
 def listar(request):
@@ -67,19 +97,35 @@ def listar(request):
 
     #listo los museos
     if request.path == "/museos":
+        respuesta += formulario
         respuesta += "<h1>Listado de museos<br></h1>"
         respuesta += "<ul>"
-        for listado in Museo.objects.all():
-            respuesta += "<li><a href='" + str(listado.url) + "'>" + listado.nombre + '</a>'
+
+        #Compruebo si hay búsqueda de distrito
+        try:
+            distrito = request.GET["Distrito"]
+            museos_distrito = Museo.objects.filter(distrito=str(distrito))
+            if str(museos_distrito) == "[]":
+                return HttpResponseNotFound (formulario + "No hay museos en ese distrito")
+            for listado in museos_distrito:
+                respuesta += "<li><a href='" + str(listado.url) + "'>" + listado.nombre + '</a>'
+
+        #Si no la hay muestro todos los museos
+        except MultiValueDictKeyError:
+            for listado in Museo.objects.all():
+                respuesta += "<li><a href='" + str(listado.url) + "'>" + listado.nombre + '</a>'
+
+        respuesta += "</ul>"
+
     #Listo los usuarios
     elif request.path == "/usuarios":
         respuesta += "<h1>Listado de usuarios<br></h1>"
         for listado in Usuario.objects.all():
             respuesta += "<li>" + str(listado.nombre)
+        respuesta += "</ul>"
     else:
         return HttpResponseNotFound("Recurso inexistente.")
 
-    respuesta += "<ul>"
     logged = auth(request)
     return HttpResponse(logged + respuesta)
 
@@ -115,6 +161,7 @@ def usuario(request, usuario):
     respuesta += "<br>Color: " + str(usuario.color) + "</body>"
     return HttpResponse(respuesta)
 
+#Muestro el xml del usuario
 def mostrar_xml(request, usuario):
     try:
         usuario = Usuario.objects.get(nombre = usuario)

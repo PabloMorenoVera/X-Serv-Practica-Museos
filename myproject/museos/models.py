@@ -4,6 +4,7 @@ from django.db import models
 class Museo(models.Model):
     nombre = models.CharField(max_length=128)
     distrito = models.CharField(max_length=128)
+    accesibilidad = models.IntegerField()
     url = models.URLField(max_length=200)
     def __str__(self):
         return self.nombre
