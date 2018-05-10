@@ -1,0 +1,27 @@
+{% extends "web/index.html" %}
+
+{% block menu %}
+<ul>
+	<li><a href="/" class="active">Inicio</a></li>
+	<li><a href="/museos">Museos</a></li>
+	<li><a href="/about">About</a></li>
+</ul>
+{% endblock %}
+
+{% block museos %}
+	{% for museo in museos %}
+		<div class="post">
+			<h4> {{ museo.nombre }} <a href="museos/{{ museo.id }}">Página del museo</a></h4>
+			<ul class="controls">
+				<li>Dirección: {{ museo.direccion }}</li><br>
+				<li><a href="/museos/{{ museo.id }}" class="more">Más información</a></li>
+			</ul>
+		</div>
+
+		<div class="divider2"></div>
+	{% endfor %}
+{% endblock %}
+
+{% block pages %}
+	<h4>{{ pages|safe }}</h4>
+{% endblock %}

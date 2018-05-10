@@ -5,6 +5,7 @@ class Museo(models.Model):
     nombre = models.CharField(max_length=128)
     distrito = models.CharField(max_length=128)
     accesibilidad = models.IntegerField()
+    direccion = models.CharField(max_length=128)
     url = models.URLField(max_length=200)
     def __str__(self):
         return self.nombre
@@ -15,6 +16,7 @@ class Usuario(models.Model):
     fecha = models.DateField()
     letra = models.CharField(max_length=64)
     color = models.CharField(max_length=32)
+    titulo = models.CharField(max_length=64)
     def __str__(self):
         return self.nombre
 

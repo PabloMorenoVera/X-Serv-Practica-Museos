@@ -1,9 +1,11 @@
+#From https://docs.djangoproject.com/en/1.8/topics/http/shortcuts/
 from django.shortcuts import render
+from django.shortcuts import render_to_response
 
-# Create your views here.
 from .models import Museo, Usuario, Comentario
 
-from django.http import HttpResponse, HttpResponseNotFound
+# From https://code.djangoproject.com/ticket/1494 and https://stackoverflow.com/questions/44185354/django-tutorial-name-httpresponse-is-not-defined
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 
 from django.contrib.auth import authenticate, login
@@ -17,6 +19,8 @@ import urllib.request
 
 from django.utils.datastructures import MultiValueDictKeyError
 
+atributos = []
+
 #Función para comprobar si un usuario está logueado
 def auth(request):
     if request.user.is_authenticated():
@@ -24,6 +28,7 @@ def auth(request):
     else:
         logged = 'Not logged in.' + "<a href='/login'>Login</a>"
     return logged
+
 
 # Tengo que meter el value del hidden en la plantilla como una variable.
 form_accesibilidad = """
@@ -33,50 +38,39 @@ form_accesibilidad = """
 </form>
 """
 
-def mostrar_accesibles():
-    respuesta = "<ul>"
-    for listado in Museo.objects.filter(accesibilidad=1):
-        respuesta += "<li><a href= '" + str(listado.url) + "'>" + listado.nombre + '</a>'
-    respuesta += "</ul>"
-    logged = auth(request)
-    return HttpResponse(form_accesibilidad + logged + "<br><br><h1>Listado de Museos accesibles</h1>" + respuesta)
-
-
 #Página principal "/"
 def home(request, d1 = 0, d2 = 5):
-    respuesta = "<ul>"
+    museos_totales = Museo.objects.all()
     if request.path == "/":
         #Compruebo si está selecccionado el botón de accesibles
         try:
             accesible = request.GET["Accesible"]
-            museos_accesibles = Museo.objects.filter(accesibilidad=accesible)
-            if str(museos_accesibles) == "[]":
-                return HttpResponseNotFound (form_accesibilidad + "No hay museos accesibles")
+            museos = Museo.objects.filter(accesibilidad=accesible)
 
-            for listado in museos_accesibles:
-                respuesta += "<li><a href='" + str(listado.url) + "'>" + listado.nombre + '</a>'
+            if str(museos) == "[]":
+                return HttpResponseNotFound ("No hay museos accesibles")
+            else:
+                return render_to_response('web/index.html', {'Titulo': 'Listado de museos',
+                    'museos': museos, 'logged': auth(request)})
 
         #Si no está seleccionado muestro los 5 primeros museos
         except MultiValueDictKeyError:
-            for listado in Museo.objects.all()[:5]:
-                respuesta += "<li><a href= '" + str(listado.url) + "'>" + listado.nombre + '</a>'
+            museos = Museo.objects.annotate()[:5]
 
     else:
         #Muestro los museos de la página que corresponde
-        for listado in Museo.objects.all()[int(d1):int(d2)]:
-            respuesta += "<li><a href= '" + str(listado.url) + "'>" + listado.nombre + '</a>'
-
-    respuesta += "</ul>"
+        museos = Museo.objects.annotate()[int(d1):int(d2)]
 
     #Escribo las páginas con museos
     j = 1
-    for i in range(0,int(round(Museo.objects.all().count()/5,0)+1)):
-        respuesta += "<a href='http://localhost:8000/" + str(i*5) + "-" + str(i*5+5) + "'>" + str(j) + "</a> "
+    pages = ""
+    for i in range(0,int(round(museos_totales.count()/5,0)+1)):
+        pages += "<a href='http://localhost:8000/" + str(i*5) + "-" + str(i*5+5) + "'>" + str(j) + "</a> "
         j += 1
 
-    #Añado la autenticación
-    logged = auth(request)
-    return HttpResponse(form_accesibilidad + logged + "<br><br><h1>Listado de Museos</h1>" + respuesta)
+    return render_to_response('web/inicio.html', {'Titulo': 'Home',
+        'museos': museos, 'pages': pages, 'logged': auth(request)})
+
 
 #Descargo el xml de la página
 def get_xml(request):
@@ -91,43 +85,22 @@ formulario = """
 </form>
 """
 
-# Muestro el listado de museos o usuarios
+# Muestro el listado de museos
 def listar(request):
-    respuesta = "<title>Práctica museos</title>"
 
-    #listo los museos
-    if request.path == "/museos":
-        respuesta += formulario
-        respuesta += "<h1>Listado de museos<br></h1>"
-        respuesta += "<ul>"
+    #Compruebo si hay búsqueda de distrito
+    try:
+        distrito = request.GET["Distrito"]
+        museos = Museo.objects.filter(distrito=str(distrito))
+        if str(lista) == "[]":
+            return HttpResponseNotFound (formulario + "No hay museos en ese distrito")
 
-        #Compruebo si hay búsqueda de distrito
-        try:
-            distrito = request.GET["Distrito"]
-            museos_distrito = Museo.objects.filter(distrito=str(distrito))
-            if str(museos_distrito) == "[]":
-                return HttpResponseNotFound (formulario + "No hay museos en ese distrito")
-            for listado in museos_distrito:
-                respuesta += "<li><a href='" + str(listado.url) + "'>" + listado.nombre + '</a>'
+    #Si no la hay muestro todos los museos
+    except MultiValueDictKeyError:
+        museos = Museo.objects.all()
 
-        #Si no la hay muestro todos los museos
-        except MultiValueDictKeyError:
-            for listado in Museo.objects.all():
-                respuesta += "<li><a href='" + str(listado.url) + "'>" + listado.nombre + '</a>'
-
-        respuesta += "</ul>"
-
-    #Listo los usuarios
-    elif request.path == "/usuarios":
-        respuesta += "<h1>Listado de usuarios<br></h1>"
-        for listado in Usuario.objects.all():
-            respuesta += "<li>" + str(listado.nombre)
-        respuesta += "</ul>"
-    else:
-        return HttpResponseNotFound("Recurso inexistente.")
-
-    logged = auth(request)
-    return HttpResponse(logged + respuesta)
+    return render_to_response('web/museos.html', {'Titulo': 'Listado de museos',
+        'museos': museos, 'logged': auth(request)})
 
 
 #Muestro los datos del museo
@@ -136,6 +109,8 @@ def mostrar_museo(request, id):
         museo = Museo.objects.get(id=id)
     except Museo.DoesNotExist:
         return HttpResponseNotFound("El museo no existe.")
+
+    return render_to_response('web/museo.html', {'Titulo': 'Ficha técnica','museo': museo})
 
     respuesta = "<title>Práctica museos</title>"
     respuesta += "<h1>Página del museo " + str(museo.nombre) + ".</h1>"
@@ -152,14 +127,8 @@ def usuario(request, usuario):
     except Usuario.DoesNotExist:
         return HttpResponseNotFound("Usuario inexistente.")
 
-    respuesta = "<title>Práctica museos</title>"
-    respuesta += "<h1>Página personal de " + str(usuario.nombre) + ".</h1>"
-    respuesta += "<head>Museos favoritos:<ul>"
-    for museo in usuario.museos.all():
-        respuesta += "<li>" + str(museo)
-    respuesta += "</ul></head><body>Letra: " + str(usuario.letra)
-    respuesta += "<br>Color: " + str(usuario.color) + "</body>"
-    return HttpResponse(respuesta)
+    return render_to_response('web/usuario.html', {'Titulo': usuario.titulo,'usuario': usuario, 'museos': usuario.museos.all()})
+
 
 #Muestro el xml del usuario
 def mostrar_xml(request, usuario):
@@ -168,6 +137,9 @@ def mostrar_xml(request, usuario):
     except Usuario.DoesNotExist:
         return HttpResponseNotFound("Usuario inexistente.")
 
-    tmp = get_template("xml/xml_tmp.xml")
-    c = Context({'nombre': str(usuario.nombre), 'museos': usuario.museos.all()})
-    return HttpResponse(tmp.render(c), content_type='text/xml')
+    return render_to_response('xml/xml_tmp.xml', {'nombre': str(usuario.nombre), 'museos': usuario.museos.all()}, content_type='text/xml')
+
+# From https://stackoverflow.com/questions/25274104/logout-page-not-working-in-django
+def logoutUser(request):
+   logout(request)
+   return HttpResponseRedirect('/')
