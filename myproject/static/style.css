@@ -208,9 +208,9 @@ margin-bottom: 2px;
 
 #headercontent
 {
-position: absolute;
+position: relative;
 bottom: 0em;
-padding: 0em 2.0em 1.3em 2.0em;
+padding: 0em 1.0em 0em 2.0em;
 }
 
 #headercontent h1
@@ -230,6 +230,36 @@ color: #777;
 font-size: 1.0em;
 font-weight: normal;
 color: #aaa;
+}
+
+#login
+{
+position: absolute;
+top: 1.0em;
+right: 2.0em;
+padding-right: 0.0em;
+}
+#search input.text
+{
+margin-right: 0.5em;
+vertical-align: middle;
+border-top: solid 1px #000000;
+border-right: 0px;
+border-bottom: solid 1px #777777;
+border-left: 0px;
+padding: 0.15em;
+width: 10.0em;
+}
+
+#login input.submit
+{
+background: #939B00 url('images/buttonbg.gif') repeat-x;
+border: solid 1px #5F6800;
+font-weight: bold;
+padding: 0.25em;
+font-size: 0.8em;
+color: #F2F3DE;
+vertical-align: middle;
 }
 
 #log{
@@ -331,7 +361,13 @@ margin-bottom: 1.5em;
 
 #content
 {
+height: 9.0em
 padding: 0em 2.0em 0em 2.0em;
+}
+
+#normalcontent h1
+{
+font-size: 4em;
 }
 
 #primarycontainer
@@ -344,6 +380,11 @@ width: 100%;
 #primarycontent
 {
 margin: 1.5em 22.0em 0em 0em;
+}
+
+#primarycontent h3
+{
+font-size: 2.5em
 }
 
 #secondarycontent

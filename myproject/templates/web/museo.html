@@ -10,17 +10,24 @@
 
 {% block museo %}
 <div class="post">
-	<h3> Nombre: {{ museo.nombre }}</h3><br><br>
-	<h2> Direccion: </h2><br>
-	<h2> Distrito: {{ museo.distrito }}</h2><br>
-	<h2> Contacto: </h2><br>
+	<h3> Nombre: {{ museo.nombre }}</h3>
+	<div class="divider2"></div>
+	<h2> Direccion: </h2>
+	<div class="divider2"></div>
+	<h2> Distrito: {{ museo.distrito }}</h2>
+	<div class="divider2"></div>
+	<h2> Contacto: </h2>
+	<div class="divider2"></div>
 	{% if museo.accesibilidad == 1 %}
-		<h2> Accesibilidad: Si</h2><br>
+		<h2> Accesibilidad: Si</h2>
 	{% else %}
-		<h2> Accesibilidad: No</h2><br>
+		<h2> Accesibilidad: No</h2>
 	{% endif %}
-	<h2> Barrio: </h2><br>
-	<h2> Descripcion: </h2><br>
-	<h2><a href="{{ museo.url }}"> Página Web</a></h2><br>
+	<div class="divider2"></div>
+	<h2> Barrio: </h2>
+	<div class="divider2"></div>
+	<h2> Descripcion: </h2>
+	<div class="divider2"></div>
+	<h2><a href="{{ museo.url }}"> Página Web</a></h2>
 </div>
 {% endblock %}

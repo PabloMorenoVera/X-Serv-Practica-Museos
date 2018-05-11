@@ -16,7 +16,8 @@ class Usuario(models.Model):
     fecha = models.DateField()
     letra = models.CharField(max_length=64)
     color = models.CharField(max_length=32)
-    titulo = models.CharField(max_length=64)
+    #From https://stackoverflow.com/questions/7341066/can-i-make-an-admin-field-not-required-in-django-without-creating-a-form
+    titulo = models.CharField(max_length=64, blank=True)
     def __str__(self):
         return self.nombre
 

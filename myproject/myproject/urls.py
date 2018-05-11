@@ -17,21 +17,18 @@ from django.contrib import admin
 from django.contrib.auth.views import logout
 from django.contrib.auth.views import login
 from django.views.static import serve
-from django.views.generic import RedirectView
 
 urlpatterns = [
-    url(r'static/(.*)$', serve, {'document_root': 'templates/web'}),
     url(r'media/(.*)$', serve, {'document_root': 'templates/web'}),
     url(r'^$', 'museos.views.home'),
     url(r'^(\d+)-(\d+)', 'museos.views.home'),
     # From https://stackoverflow.com/questions/25274104/logout-page-not-working-in-django
     url(r'^logout', 'museos.views.logoutUser'),
-    url(r'^login', login),
+    url(r'^login', 'museos.views.loginUser'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^xml$', 'museos.views.get_xml'),
     url(r'^museos$', 'museos.views.listar'),
     url(r'^museos/(\d+)$', 'museos.views.mostrar_museo'),
-    url(r'^accounts/profile/', RedirectView.as_view(url='/', permanent=True)),
     url(r'^(\w+)$', 'museos.views.usuario'),
     url(r'^(\w+)/xml$', 'museos.views.mostrar_xml')
 ]
