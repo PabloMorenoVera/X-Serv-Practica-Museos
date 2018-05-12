@@ -8,6 +8,19 @@
 </ul>
 {% endblock %}
 
+{% block boton_accesibles %}
+	{% if accesible == 0 %}
+	<form action="/" method="GET">
+		<input type="hidden" name="Accesible" value="1">
+			<input type="submit" value="Accesibles">
+	</form>
+	{% else %}
+		<form action="" method="GET">
+				<input type="submit" value="Accesibles">
+		</form>
+	{% endif %}
+{% endblock %}
+
 {% block museos %}
 	{% for museo in museos %}
 		<div class="post">

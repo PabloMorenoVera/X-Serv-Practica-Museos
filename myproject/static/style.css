@@ -235,11 +235,12 @@ color: #aaa;
 #login
 {
 position: absolute;
-top: 1.0em;
-right: 2.0em;
+top: 3em;
+right: 2.5em;
 padding-right: 0.0em;
 }
-#search input.text
+
+#login input.text
 {
 margin-right: 0.5em;
 vertical-align: middle;
@@ -260,19 +261,6 @@ padding: 0.25em;
 font-size: 0.8em;
 color: #F2F3DE;
 vertical-align: middle;
-}
-
-#log{
-position: absolute;
-top: 6.5em;
-right: 2.0em;
-padding-right: 0.0em;
-}
-
-#log h4
-{
-color: #aaa;
-position: right;
 }
 
 #search

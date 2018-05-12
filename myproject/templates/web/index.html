@@ -21,15 +21,19 @@
 				</div>
 
 				<div id="login">
-					<form method="POST" action="/login">{% csrf_token %}
-						<input type="text" class="text" name="user" value="usuario"/><br>
-						<input type="text" class="text" name="psswd" value="contraseña"/>
-						<input type="submit" value="login" class="submit"/>
-					</form>
-				</div>
-
-				<div id="log">
-					<h4>{{ logged|safe }}</h4>
+					{% if user.is_authenticated %}
+						<form method="POST" action="/logout">{% csrf_token %}
+							<input type="text" class="text" name="user" value="{{user.get_username}}"/><br>
+							<input type="text" class="text" name="psswd" value=""/>
+							<input type="submit" value="logout" class="submit"/>
+						</form>
+					{% else %}
+						<form method="POST" action="/login">{% csrf_token %}
+							<input type="text" class="text" name="user" value="usuario"/><br>
+							<input type="text" class="text" name="psswd" value="contraseña"/>
+							<input type="submit" value="login" class="submit"/>
+						</form>
+					{% endif %}
 				</div>
 			</div>
 
@@ -40,12 +44,9 @@
 			<div id="menu">
 				{% block menu %} {% endblock %}
 
-				<form method="post" action="">{% csrf_token %}
-					<div id="search">
-						<input type="text" class="text" maxlength="64" name="keywords" />
-						<input type="submit" class="submit" value="Search" />
-					</div>
-				</form>
+				<div id="search">
+					{% block boton_accesibles %} {% endblock %}
+				</div>
 			</div>
 			<div id="menubottom"></div>
 
@@ -78,22 +79,19 @@
 								{% block pages%} {% endblock %}
 							</div>
 						</div>
-
 						<!-- Primary content area end -->
+
 					</div>
 				</div>
 
 				{% block paginas_personales %} {% endblock %}
 
-
 			</div>
 
 			<div id="footer">
-					<div class="left">&copy; 2006 Your Website Name. All rights reserved.</div>
+					<div class="left">&copy; <a href="https://datos.madrid.es/portal/site/egob/menuitem.c05c1f754a33a9fbe4b2e4b284f1?vgnextoid=118f2fdbecc63410VgnVCM1000000b205a0aRCRD&vgnextchannel=374512b9ace9f310VgnVCM100000171f5a0aRCRD&vgnextfmt=default"> Esta aplicación utiliza datos del portal de datos abiertos de la ciudad de Madrid.</a></div>
 					<div class="right">Autor: Pablo Moreno Vera</div>
 			</div>
-
 		</div>
-
 	</body>
 </html>

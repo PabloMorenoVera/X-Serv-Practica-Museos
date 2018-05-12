@@ -23,23 +23,6 @@ from django.utils.datastructures import MultiValueDictKeyError
 
 atributos = []
 
-# Función para comprobar si un usuario está logueado
-def auth(request):
-    if request.user.is_authenticated():
-        logged = 'Logged in as ' + request.user.username + "    " + "<a href= '/logout'>Logout</a>"
-    else:
-        logged = 'Not logged in.'
-    return logged
-
-
-# Tengo que meter el value del hidden en la plantilla como una variable.
-form_accesibilidad = """
-<form action="" method="GET">
-    <input type="hidden" name="Accesible" value="1">
-    <input type="submit" value="Accesibles">
-</form>
-"""
-
 # Página principal "/"
 def home(request, d1 = 0, d2 = 5):
     museos_totales = Museo.objects.all()
@@ -52,9 +35,9 @@ def home(request, d1 = 0, d2 = 5):
             if str(museos) == "[]":
                 return HttpResponseNotFound ("No hay museos accesibles")
             else:
-                return render_to_response('web/index.html', {'Titulo': 'Listado de museos',
-                    'museos': museos, 'logged': auth(request),
-                    'paginas': Usuario.objects.all()})
+                return render_to_response('web/inicio.html', {'Titulo': 'Listado de museos',
+                    'museos': museos, 'paginas': Usuario.objects.all(),
+                    'accesible': accesible}, context_instance=RequestContext(request))
 
         # Si no está seleccionado muestro los 5 primeros museos
         except MultiValueDictKeyError:
@@ -65,6 +48,7 @@ def home(request, d1 = 0, d2 = 5):
         museos = Museo.objects.annotate()[int(d1):int(d2)]
 
     # Escribo las páginas con museos
+    accesible = 0
     j = 1
     pages = ""
     for i in range(0,int(round(museos_totales.count()/5,0)+1)):
@@ -72,9 +56,8 @@ def home(request, d1 = 0, d2 = 5):
         j += 1
 
     return render_to_response('web/inicio.html', {'Titulo': 'Inicio',
-        'museos': museos, 'pages': pages, 'logged': auth(request),
-        'paginas': Usuario.objects.all()},
-        context_instance=RequestContext(request))
+        'museos': museos, 'pages': pages, 'paginas': Usuario.objects.all(),
+        'accesible': accesible}, context_instance=RequestContext(request))
 
 
 # Descargo el xml de la página
@@ -105,7 +88,7 @@ def listar(request):
         museos = Museo.objects.all()
 
     return render_to_response('web/museos.html', {'Titulo': 'Listado de museos',
-        'museos': museos, 'logged': auth(request)})
+        'museos': museos}, context_instance=RequestContext(request))
 
 
 # Muestro los datos del museo
@@ -115,14 +98,8 @@ def mostrar_museo(request, id):
     except Museo.DoesNotExist:
         return HttpResponseNotFound("El museo no existe.")
 
-    return render_to_response('web/museo.html', {'Titulo': 'Ficha técnica','museo': museo})
-
-    respuesta = "<title>Práctica museos</title>"
-    respuesta += "<h1>Página del museo " + str(museo.nombre) + ".</h1>"
-    respuesta += "<head>Distrito:<ul><li>" + str(museo.distrito) + "</ul></head><br>"
-    respuesta += "<body>Link: <a href='" + str(museo.url) + "'>" + str(museo.url) + "</a></body>"
-    logged = auth(request)
-    return HttpResponse(logged + respuesta)
+    return render_to_response('web/museo.html', {'Titulo': 'Ficha técnica',
+    'museo': museo}, context_instance=RequestContext(request))
 
 
 # Muestro los datos del usuario
@@ -133,7 +110,8 @@ def usuario(request, usuario):
         return HttpResponseNotFound("Usuario inexistente.")
 
     return render_to_response('web/usuario.html', {'Titulo': usuario.titulo,
-        'usuario': usuario, 'museos': usuario.museos.all(), 'logged': auth(request)})
+        'usuario': usuario, 'museos': usuario.museos.all()},
+        context_instance=RequestContext(request))
 
 
 # Muestro el xml del usuario
@@ -143,7 +121,8 @@ def mostrar_xml(request, usuario):
     except Usuario.DoesNotExist:
         return HttpResponseNotFound("Usuario inexistente.")
 
-    return render_to_response('xml/xml_tmp.xml', {'nombre': str(usuario.nombre), 'museos': usuario.museos.all()}, content_type='text/xml')
+    return render_to_response('xml/xml_tmp.xml', {'nombre': str(usuario.nombre),
+    'museos': usuario.museos.all()}, content_type='text/xml')
 
 # From https://stackoverflow.com/questions/25274104/logout-page-not-working-in-django
 def logoutUser(request):
