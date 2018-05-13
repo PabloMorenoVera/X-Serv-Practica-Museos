@@ -66,13 +66,6 @@ def get_xml(request):
     return HttpResponse(xml, content_type='text/xml')
 
 
-formulario = """
-<form action="" method="GET">
-    <input type="text" name="Distrito" value=""><br>
-    <input type="submit" value="Enviar">
-</form>
-"""
-
 # Muestro el listado de museos
 def listar(request):
 
@@ -80,7 +73,7 @@ def listar(request):
     try:
         distrito = request.GET["Distrito"]
         museos = Museo.objects.filter(distrito=str(distrito))
-        if str(lista) == "[]":
+        if str(museos) == "[]":
             return HttpResponseNotFound (formulario + "No hay museos en ese distrito")
 
     # Si no la hay muestro todos los museos

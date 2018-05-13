@@ -12,11 +12,11 @@
 	{% if accesible == 0 %}
 	<form action="/" method="GET">
 		<input type="hidden" name="Accesible" value="1">
-			<input type="submit" value="Accesibles">
+			<input type="submit" value="Accesibles" class="submit">
 	</form>
 	{% else %}
 		<form action="" method="GET">
-				<input type="submit" value="Accesibles">
+				<input type="submit" value="Accesibles" class="submit">
 		</form>
 	{% endif %}
 {% endblock %}

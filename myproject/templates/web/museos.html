@@ -8,6 +8,13 @@
 </ul>
 {% endblock %}
 
+{% block distrito %}
+<form method="GET" action="/museos">
+	<input type="text" class="text" maxlength="64" name="Distrito" />
+	<input type="submit" class="submit" value="Search" />
+</form>
+{% endblock %}
+
 {% block museos %}
 	{% for museo in museos %}
 		<div class="post">
