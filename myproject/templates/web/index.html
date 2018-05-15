@@ -13,6 +13,9 @@
 		<div id="upbg"></div>
 
 		<div id="outer">
+			<style>
+				{{ formato }}
+			</style>
 
 			<div id="header">
 				<div id="headercontent">
@@ -58,6 +61,8 @@
 					<h1>{{ Titulo }}</h1>
 					<div class="contentarea">
 						<!-- Normal content area start -->
+						{% block añadir %} {% endblock %}
+						{{ add }}
 						<!-- Normal content area end -->
 					</div>
 				</div>
@@ -70,9 +75,11 @@
 				<div id="primarycontainer">
 					<div id="primarycontent">
 						<!-- Primary content area start -->
-						{% block museos%} {% endblock %}
-						{% block museo%} {% endblock %}
-						{% block usuario%} {% endblock %}
+						{% block museos %} {% endblock %}
+						{% block museo %} {% endblock %}
+						{% block usuario %} {% endblock %}
+						{% block Comentarios %} {% endblock%}
+						{% block Comentario %} {% endblock %}
 
 						<div id="pages">
 							<div class="post">

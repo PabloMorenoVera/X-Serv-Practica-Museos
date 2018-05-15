@@ -21,43 +21,60 @@ import urllib.request
 
 from django.utils.datastructures import MultiValueDictKeyError
 
+# From https://docs.djangoproject.com/en/1.8/topics/db/examples/many_to_one/
+from django.db.models import Count
+
+from math import ceil
+
 atributos = []
 
+def get_formato(request):
+    if request.user.is_authenticated():
+        user = request.user.username
+    else:
+        return ""
+
+    usuario = Usuario.objects.get(nombre=user)
+
+    # From https://www.w3schools.com/tags/tag_style.asp
+    formato  = ("body{font-family: 'georgia', 'times new roman', serif;"
+                "font-size: " + usuario.letra + "em;"
+                "background-color: " + usuario.color + ";}")
+
+    return formato
+
 # Página principal "/"
-def home(request, d1 = 0, d2 = 5):
+def home(request, d1=0, d2=5):
     museos_totales = Museo.objects.all()
-    if request.path == "/":
-        # Compruebo si está selecccionado el botón de accesibles
-        try:
+    # Compruebo si está selecccionado el botón de accesibles
+    if request.method == "GET" and 'Accesible' in request.GET:
+        if request.GET['Accesible'] != "":
             accesible = request.GET["Accesible"]
             museos = Museo.objects.filter(accesibilidad=accesible)
+        else:
+            return HttpResponseNotFound ("No hay museos accesibles")
 
-            if str(museos) == "[]":
-                return HttpResponseNotFound ("No hay museos accesibles")
-            else:
-                return render_to_response('web/inicio.html', {'Titulo': 'Listado de museos',
-                    'museos': museos, 'paginas': Usuario.objects.all(),
-                    'accesible': accesible}, context_instance=RequestContext(request))
+        return render_to_response('web/inicio.html', {'Titulo': 'Listado de museos',
+            'museos': museos, 'paginas': Usuario.objects.all(),
+            'accesible': accesible, 'formato': get_formato(request)},
+            context_instance=RequestContext(request))
 
-        # Si no está seleccionado muestro los 5 primeros museos
-        except MultiValueDictKeyError:
-            museos = Museo.objects.annotate()[:5]
-
-    else:
-        # Muestro los museos de la página que corresponde
-        museos = Museo.objects.annotate()[int(d1):int(d2)]
+    # Si no está seleccionado muestro los 5 museos
+    #From https://docs.djangoproject.com/en/1.8/topics/db/examples/many_to_one/
+    museos = Museo.objects.annotate(count=Count('comentario__museo')).order_by('-count').annotate()[int(d1):int(d2)]
 
     # Escribo las páginas con museos
     accesible = 0
     j = 1
     pages = ""
-    for i in range(0,int(round(museos_totales.count()/5,0)+1)):
+    for i in range(0,int(ceil(museos_totales.count()/5))):
         pages += "<a href='http://localhost:8000/" + str(i*5) + "-" + str(i*5+5) + "'>" + str(j) + "</a> "
         j += 1
 
     return render_to_response('web/inicio.html', {'Titulo': 'Inicio',
         'museos': museos, 'pages': pages, 'paginas': Usuario.objects.all(),
-        'accesible': accesible}, context_instance=RequestContext(request))
+        'accesible': accesible, 'formato': get_formato(request)},
+        context_instance=RequestContext(request))
 
 
 # Descargo el xml de la página
@@ -70,41 +87,93 @@ def get_xml(request):
 def listar(request):
 
     # Compruebo si hay búsqueda de distrito
-    try:
-        distrito = request.GET["Distrito"]
-        museos = Museo.objects.filter(distrito=str(distrito))
-        if str(museos) == "[]":
-            return HttpResponseNotFound (formulario + "No hay museos en ese distrito")
+    if request.method == "GET" and 'Distrito' in request.GET:
+        if request.GET['Distrito'] != "":
+            museos = Museo.objects.filter(distrito=str(request.GET["Distrito"]))
+        else:
+            return HttpResponseNotFound ("No hay museos en ese distrito")
 
     # Si no la hay muestro todos los museos
-    except MultiValueDictKeyError:
+    else:
         museos = Museo.objects.all()
 
     return render_to_response('web/museos.html', {'Titulo': 'Listado de museos',
-        'museos': museos}, context_instance=RequestContext(request))
+        'museos': museos, 'formato': get_formato(request)},
+        context_instance=RequestContext(request))
 
 
 # Muestro los datos del museo
+@csrf_exempt
 def mostrar_museo(request, id):
+    add = ""
     try:
         museo = Museo.objects.get(id=id)
     except Museo.DoesNotExist:
         return HttpResponseNotFound("El museo no existe.")
 
+    if request.method == "POST":
+        usuario = request.user.username
+        usuario = Usuario.objects.get(nombre=usuario)
+
+        #Comrpuebo si han añadido un comentario
+        if 'Comentario' in request.POST:
+            if request.POST["Comentario"] != "":
+                comentario = Comentario(texto=request.POST["Comentario"],
+                                        usuario=usuario, museo=Museo.objects.get(id=id))
+                comentario.save()
+
+        else:
+            #Compruebo si el museo está añadido a favoritos
+            for museo in usuario.museos.all():
+                if museo == Museo.objects.get(id=id):
+                    return HttpResponseNotFound("El museo ya está añadido")
+
+            usuario.museos.add(Museo.objects.get(id=id))
+            add = "Museo añadido."
+
+    comentarios = Comentario.objects.filter(museo=Museo.objects.get(id=id))
+
     return render_to_response('web/museo.html', {'Titulo': 'Ficha técnica',
-    'museo': museo}, context_instance=RequestContext(request))
+        'museo': Museo.objects.get(id=id), 'add': add, 'formato': get_formato(request),
+        'comentarios': comentarios}, context_instance=RequestContext(request))
 
 
 # Muestro los datos del usuario
-def usuario(request, usuario):
+def usuario(request, usuario, d1=0, d2=5):
     try:
+        # Extraigo el usuario del URL
         usuario = Usuario.objects.get(nombre = usuario)
     except Usuario.DoesNotExist:
         return HttpResponseNotFound("Usuario inexistente.")
 
-    return render_to_response('web/usuario.html', {'Titulo': usuario.titulo,
-        'usuario': usuario, 'museos': usuario.museos.all()},
-        context_instance=RequestContext(request))
+    # Actualizo el valor del formulario
+    if request.method == "POST":
+        if 'Titulo' in request.POST:
+            usuario.titulo = request.POST['Titulo']
+        elif 'Letra' in rquest.POST['Letra'] and 'Color' in request.POST['Color']:
+            usuario.letra = request.POST['Letra']
+            usuario.color = request.POST['Color']
+
+        usuario.save()
+
+    # Muestro los museos de la página que corresponde
+    museos = usuario.museos.annotate()[int(d1):int(d2)]
+
+    # Escribo las páginas con museos
+    j = 1
+    pages = ""
+    for i in range(0,int(ceil(usuario.museos.count()/5))):
+        pages += "<a href='http://localhost:8000/" + str(usuario.nombre) + "/" + str(i*5) + "-" + str(i*5+5) + "'>" + str(j) + "</a> "
+        j += 1
+
+    if usuario.titulo == "":
+        return render_to_response('web/usuario.html', {'Titulo': "Página de " + usuario.nombre,
+            'usuario': usuario, 'museos': museos, 'pages': pages, 'formato': get_formato(request)},
+            context_instance=RequestContext(request))
+    else:
+        return render_to_response('web/usuario.html', {'Titulo': usuario.titulo,
+            'usuario': usuario, 'museos': museos, 'pages': pages, 'formato': get_formato(request)},
+            context_instance=RequestContext(request))
 
 
 # Muestro el xml del usuario

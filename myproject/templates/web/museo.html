@@ -8,6 +8,13 @@
 </ul>
 {% endblock %}
 
+{%block añadir %}
+<form action="/museos/{{ museo.id }}" method="POST">{% csrf_token %}
+	<input type="hidden" name="Add" value="Si">
+		<input type="submit" value="Añadir" class="submit">
+</form>
+{% endblock %}
+
 {% block museo %}
 <div class="post">
 	<h3> Nombre: {{ museo.nombre }}</h3>
@@ -29,5 +36,22 @@
 	<h2> Descripcion: </h2>
 	<div class="divider2"></div>
 	<h2><a href="{{ museo.url }}"> Página Web</a></h2>
+	<div class="divider1"></div>
 </div>
+{% endblock %}
+
+{% block Comentarios %}
+	<h2> Comentarios: </h2>
+	{% for comentario in comentarios %}
+		<div class="coments">
+			<h4> {{ comentario.usuario }}: {{ comentario.texto }}</h4>
+		</div>
+	{% endfor %}
+{% endblock %}
+
+{% block Comentario %}
+<form method="POST" action="/museos/{{ museo.id }}">{% csrf_token %}
+	<h2><input type="text" class="text" size="87" name="Comentario" value=""/>
+	<input type="submit" class="submit" value="Comentar" /></h2>
+</form>
 {% endblock %}

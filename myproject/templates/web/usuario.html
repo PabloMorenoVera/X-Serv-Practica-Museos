@@ -13,9 +13,20 @@
 	<h3> Nombre: {{ usuario.nombre }}</h3>
 	<div class="divider2"></div>
 	<h2> Fecha: {{ usuario.fecha }}</h2><br>
-	<h2> Color: {{ usuario.color }}</h2><br>
-	<h2> Letra: {{ usuario.letra }}</h2><br>
-	<h2> Titulo: {{ usuario.titulo }}</h2><br>
+
+	<form method="POST" action="/{{ usuario.nombre }}">{% csrf_token %}
+		<h2><label for="uname">Título: </label>
+		<input type="text" class="text" name="Titulo" value="{{ usuario.titulo }}"/>
+		<input type="submit" value="Submit" class="submit"/></h2>
+	</form>
+
+	<form method="POST" action="/{{ usuario.nombre }}">{% csrf_token %}
+		<h2><label for="uname">Letra: </label>
+		<input type="text" class="text" name="Letra" value="{{ usuario.letra }}"/></h2>
+		<h2><label for="uname">Color: </label>
+		<input type="text" class="text" name="Color" value="{{ usuario.color }}"/>
+		<input type="submit" value="Submit" class="submit"/><h2>
+	</form>
 
 	<div class="divider1"></div>
 
@@ -23,7 +34,7 @@
 
   {% for museo in museos %}
     <div class="post">
-      <h4> {{ museo.nombre }} <a href="museos/{{ museo.id }}">Página del museo</a></h4>
+      <h4> {{ museo.nombre }} <a href="{{ museo.url }}">Página del museo</a></h4>
       <ul class="controls">
         <li>Dirección: {{ museo.direccion }}</li><br>
         <li><a href="/museos/{{ museo.id }}" class="more">Más información</a></li>
@@ -33,4 +44,8 @@
     <div class="divider2"></div>
   {% endfor %}
 </div>
+{% endblock %}
+
+{% block pages %}
+	<h4>{{ pages|safe }}</h4>
 {% endblock %}

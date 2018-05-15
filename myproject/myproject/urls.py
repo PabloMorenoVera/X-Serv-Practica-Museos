@@ -30,5 +30,6 @@ urlpatterns = [
     url(r'^museos$', 'museos.views.listar'),
     url(r'^museos/(\d+)$', 'museos.views.mostrar_museo'),
     url(r'^(\w+)$', 'museos.views.usuario'),
+    url(r'^(\w+)/(\d+)-(\d+)$', 'museos.views.usuario'),
     url(r'^(\w+)/xml$', 'museos.views.mostrar_xml')
 ]

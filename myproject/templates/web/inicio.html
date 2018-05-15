@@ -24,7 +24,7 @@
 {% block museos %}
 	{% for museo in museos %}
 		<div class="post">
-			<h4> {{ museo.nombre }} <a href="museos/{{ museo.id }}">Página del museo</a></h4>
+			<h4> {{ museo.nombre }} <a href="{{ museo.url }}">Página del museo</a></h4>
 			<ul class="controls">
 				<li>Dirección: {{ museo.direccion }}</li><br>
 				<li><a href="/museos/{{ museo.id }}" class="more">Más información</a></li>
