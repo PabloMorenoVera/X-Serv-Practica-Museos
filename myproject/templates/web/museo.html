@@ -19,25 +19,42 @@
 
 {% block museo %}
 <div class="post">
-	<h3> Nombre: {{ museo.nombre }}</h3>
+	<h3> Nombre</h3><h2>{{ museo.NOMBRE }}</h2>
 	<div class="divider2"></div>
-	<h2> Direccion: </h2>
+	<h4> ID-ENTIDAD</h4><br>{{ museo.ID_ENTIDAD }}
 	<div class="divider2"></div>
-	<h2> Distrito: {{ museo.distrito }}</h2>
+	<h4> Descripcion</h4><br>{{ museo.DESCRIPCION }}
 	<div class="divider2"></div>
-	<h2> Contacto: </h2>
+	<h4> Horario</h4><br>{{ museo.HORARIO }}
+	<div class="divider2"></div>
+	<h4> Transporte</h4><br>{{ museo.TRANSPORTE }}
 	<div class="divider2"></div>
 	{% if museo.accesibilidad == 1 %}
-		<h2> Accesibilidad: Si</h2>
+		<h4> Accesibilidad:</h4>Si
 	{% else %}
-		<h2> Accesibilidad: No</h2>
+		<h4> Accesibilidad:</h4>No
 	{% endif %}
 	<div class="divider2"></div>
-	<h2> Barrio: </h2>
+	<h4>Content-Url:</h4><br><a href="{{ museo.CONTENT_URL }}"> {{ museo.CONTENT_URL}}</a>
 	<div class="divider2"></div>
-	<h2> Descripcion: </h2>
+	<h4> Direccion</h4><br>{{ museo.CLASE_VIAL }} {{ museo.NOMBRE_VIA}}, Numero: {{ museo.NUM}}, {{ museo.LOCALIDAD }}, {{ museo.PROVINCIA}}
 	<div class="divider2"></div>
-	<h2><a href="{{ museo.url }}"> Página Web</a></h2>
+	<h4> Código Potal</h4><br>{{ museo.CODIGO_POSTAL }}
+	<div class="divider2"></div>
+	<h4> Barrio</h4><br>{{ museo.BARRIO }}
+	<div class="divider2"></div>
+	<h4> Distrito</h4><br>{{ museo.DISTRITO }}
+	<div class="divider2"></div>
+	<h4> Coordenadas</h4><br>X:{{ museo.COORDENADA_X }}, Y:{{ museo.COORDENADA_Y }}
+	<div class="divider2"></div>
+	<h4> Latitud</h4><br>{{ museo.LATITUD }}
+	<div class="divider2"></div>
+	<h4> Longitud</h4><br>{{ museo.LONGITUD }}
+	<div class="divider2"></div>
+	<h3> Contacto </h3><br>
+	<h4> TELEFONO</h4>{{ museo.TELEFONO }}<br>
+	<h4> FAX</h4>{{ museo.FAX }}<br>
+	<h4> EMAIL</h4>{{ museo.EMAIL }}<br>
 	<div class="divider1"></div>
 </div>
 {% endblock %}
@@ -46,7 +63,7 @@
 	<h2> Comentarios: </h2>
 	{% for comentario in comentarios %}
 		<div class="coments">
-			<h4>{{ comentario.texto }}</h4>
+			<h5>{{ comentario.texto }}</h5>
 		</div>
 	{% endfor %}
 {% endblock %}

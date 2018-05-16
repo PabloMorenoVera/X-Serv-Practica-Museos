@@ -41,11 +41,11 @@
 
   {% for museo in museos %}
     <div class="post">
-      <h4> {{ museo.nombre }} <a href="{{ museo.url }}">Página del museo</a></h4>
+      <h4> {{ museo.NOMBRE }} <a href="{{ museo.CONTENT_URL }}">Página del museo</a></h4>
       <ul class="controls">
-        <li>Dirección: {{ museo.direccion }}</li><br>
+        <li>Dirección: {{ museo.CLASE_VIAL }} {{ museo.NOMBRE_VIA}}, Numero: {{ museo.NUM}}, {{ museo.LOCALIDAD }}, {{ museo.PROVINCIA}}</li><br>
 				{% for favorito in favoritos %}
-					{% if favorito.museo.nombre = museo.nombre %}
+					{% if favorito.museo.NOMBRE = museo.NOMBRE %}
 						<li>Fecha: {{ favorito.fecha }}</li><br>
 					{% endif %}
 				{% endfor %}

@@ -9,13 +9,34 @@
       <contenido>
           <tipo>EntidadesYOrganismos</tipo>
           <atributos idioma="es">
-              <atributo nombre="ID-ENTIDAD">{{ museo.id }}</atributo>
-              <atributo nombre="NOMBRE">{{ museo.nombre }}</atributo>
-              <atributo nombre="CONTENT-URL">{{ museo.url }}</atributo>
-              <atributo nombre="LOCALIZACION">
-                  <atributo nombre="DISTRITO">{{ museo.distrito }}</atributo>
-              </atributo>
-              <atributo nombre="TIPO">/contenido/entidadesYorganismos/Museos</atributo>
+            <atributo nombre="ID-ENTIDAD">{{ museo.ID_ENTIDAD }}</atributo>
+            <atributo nombre="NOMBRE">{{ museo.NOMBRE }}</atributo>
+            <atributo nombre="DESCRIPCION-ENTIDAD">{{ museo.DESCRIPCION }}</atributo>
+            <atributo nombre="HORARIO">{{ museo.HORARIO }}</atributo>
+            <atributo nombre="TRANSPORTE">{{ museo.TRANSPORTE }}</atributo>
+            <atributo nombre="ACCESIBILIDAD">{{ museo.ACCESIBILIDAD }}</atributo>
+            <atributo nombre="CONTENT-URL">{{ museo.CONTENT_URL }}</atributo>
+            <atributo nombre="LOCALIZACION">
+              <atributo nombre="NOMBRE-VIA">{{ museo.NOMBRE_VIA }}</atributo>
+              <atributo nombre="CLASE-VIAL">{{ museo.CLASE_VIAL }}</atributo>
+              <atributo nombre="TIPO-NUM">{{ museo.TIPO_NUM }}</atributo>
+              <atributo nombre="NUM">{{ museo.NUM }}</atributo>
+              <atributo nombre="LOCALIDAD">{{ museo.LOCALIDAD }}</atributo>
+              <atributo nombre="PROVINCIA">{{ museo.PROVINCIA}}</atributo>
+              <atributo nombre="CODIGO-POSTAL">{{ museo.CODIGO_POSTAL }}</atributo>
+              <atributo nombre="BARRIO">{{ museo.BARRIO }}</atributo>
+              <atributo nombre="DISTRITO">{{ museo.DISTRITO }}</atributo>
+              <atributo nombre="COORDENADA-X">{{ museo.COORDENADA_X }}</atributo>
+              <atributo nombre="COORDENADA-Y">{{ museo.COORDENADA_Y }}</atributo>
+              <atributo nombre="LATITUD">{{ museo.LATITUD }}</atributo>
+              <atributo nombre="LONGITUD">{{ museo.LONGITUD }}</atributo>
+            </atributo>
+            <atributo nombre="DATOSCONTACTOS">
+              <atributo nombre="TELEFONO">914 299 216</atributo>
+              <atributo nombre="FAX">914 292 601</atributo>
+              <atributo nombre="EMAIL">casamuseolopedevega@madrid.org</atributo>
+            </atributo>
+            <atributo nombre="TIPO">/contenido/entidadesYorganismos/Museos</atributo>
           </atributos>
       </contenido>
     {% endfor %}

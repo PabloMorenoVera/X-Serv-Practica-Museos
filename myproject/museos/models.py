@@ -2,13 +2,31 @@ from django.db import models
 
 # Create your models here.
 class Museo(models.Model):
-    nombre = models.CharField(max_length=128)
-    distrito = models.CharField(max_length=128)
-    accesibilidad = models.IntegerField()
-    direccion = models.CharField(max_length=128)
-    url = models.URLField(max_length=200)
+    ID_ENTIDAD = models.TextField()
+    NOMBRE = models.TextField()
+    DESCRIPCION = models.TextField()
+    HORARIO = models.TextField()
+    TRANSPORTE = models.TextField()
+    ACCESIBILIDAD = models.TextField()
+    CONTENT_URL = models.URLField(max_length=200)
+    NOMBRE_VIA = models.TextField()
+    CLASE_VIAL = models.TextField()
+    TIPO_NUM = models.TextField()
+    NUM = models.TextField()
+    LOCALIDAD = models.TextField()
+    PROVINCIA = models.TextField()
+    CODIGO_POSTAL = models.TextField()
+    BARRIO = models.TextField()
+    DISTRITO = models.TextField()
+    COORDENADA_X = models.TextField()
+    COORDENADA_Y = models.TextField()
+    LATITUD = models.TextField()
+    LONGITUD = models.TextField()
+    TELEFONO = models.TextField()
+    FAX = models.TextField()
+    EMAIL = models.TextField()
     def __str__(self):
-        return self.nombre
+        return self.NOMBRE
 
 class Usuario(models.Model):
     nombre = models.CharField(max_length=128)
@@ -24,7 +42,7 @@ class Favorito(models.Model):
     usuario = models.ForeignKey(Usuario)
     fecha = models.DateField(auto_now_add=True)
     def __str__(self):
-        return self.museo.nombre + " - " + self.usuario.nombre
+        return self.museo.NOMBRE + " - " + self.usuario.nombre
 
 class Comentario(models.Model):
     texto = models.TextField(null=True, blank=True)

@@ -1,6 +1,5 @@
 # From https://docs.djangoproject.com/en/1.8/topics/http/shortcuts/
-from django.shortcuts import render
-from django.shortcuts import render_to_response
+from django.shortcuts import render, render_to_response, redirect
 
 from .models import Museo, Usuario, Comentario, Favorito
 
@@ -25,6 +24,7 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.db.models import Count
 
 from math import ceil
+from museos.parser import XML_parser
 
 atributos = []
 
@@ -50,7 +50,7 @@ def home(request, d1=0, d2=5):
     if request.method == "GET" and 'Accesible' in request.GET:
         if request.GET['Accesible'] != "":
             accesible = request.GET["Accesible"]
-            museos = Museo.objects.filter(accesibilidad=accesible)
+            museos = Museo.objects.filter(ACCESIBILIDAD=accesible)
         else:
             return HttpResponseNotFound ("No hay museos accesibles")
 
@@ -78,18 +78,130 @@ def home(request, d1=0, d2=5):
 
 
 # Descargo el xml de la página
-def get_xml(request):
-    xml = urllib.request.urlopen("https://datos.madrid.es/portal/site/egob/menuitem.ac61933d6ee3c31cae77ae7784f1a5a0/?vgnextoid=00149033f2201410VgnVCM100000171f5a0aRCRD&format=xml&file=0&filename=201132-0-museos&mgmtid=118f2fdbecc63410VgnVCM1000000b205a0aRCRD&preview=full")
-    return HttpResponse(xml, content_type='text/xml')
+def get_bd(request):
 
+    #xml = urllib.request.urlopen("https://datos.madrid.es/portal/site/egob/menuitem.ac61933d6ee3c31cae77ae7784f1a5a0/?vgnextoid=00149033f2201410VgnVCM100000171f5a0aRCRD&format=xml&file=0&filename=201132-0-museos&mgmtid=118f2fdbecc63410VgnVCM1000000b205a0aRCRD&preview=full")
+    #return HttpResponse(xml, content_type='text/xml')
+    museos = XML_parser(XML_File=urllib.request.urlopen("https://datos.madrid.es/portal/site/egob/menuitem.ac61933d6ee3c31cae77ae7784f1a5a0/?vgnextoid=00149033f2201410VgnVCM100000171f5a0aRCRD&format=xml&file=0&filename=201132-0-museos&mgmtid=118f2fdbecc63410VgnVCM1000000b205a0aRCRD&preview=full"))
+
+    for museo in museos:
+        try:
+            id_entidad = museos[museo]['ID-ENTIDAD']
+        except KeyError:
+            id_entidad = "No disponible"
+        try:
+            nombre = museos[museo]['NOMBRE']
+        except KeyError:
+            nombre = "No disponible"
+        try:
+            descripcion = museos[museo]['DESCRIPCION']
+        except KeyError:
+            descripcion = "No disponible"
+        try:
+            horario = museos[museo]['HORARIO']
+        except KeyError:
+            horario = "No disponible"
+        try:
+            transporte = museos[museo]['TRANSPORTE']
+        except KeyError:
+            transporte = "No disponible"
+        try:
+            accesibilidad = museos[museo]['ACCESIBILIDAD']
+        except KeyError:
+            accesibilidad = "No disponible"
+        try:
+            url = museos[museo]['CONTENT-URL']
+        except KeyError:
+            url = "No disponible"
+        try:
+            nombre_via = museos[museo]['NOMBRE-VIA']
+        except KeyError:
+            nombre_via = "No disponible"
+        try:
+            clase_vial = museos[museo]['CLASE-VIAL']
+        except KeyError:
+            clase_vial = "No disponible"
+        try:
+            tipo_num = museos[museo]['TIPO-NUM']
+        except KeyError:
+            tipo_num = "No disponible"
+        try:
+            num = museos[museo]['NUM']
+        except KeyError:
+            num = "No disponible"
+        try:
+            localidad = museos[museo]['LOCALIDAD']
+        except KeyError:
+            localidad = "No disponible"
+        try:
+            provincia = museos[museo]['PROVINCIA']
+        except KeyError:
+            provincia = "No disponible"
+        try:
+            cp = museos[museo]['CODIGO-POSTAL']
+        except KeyError:
+            cp = "No disponible"
+        try:
+            barrio = museos[museo]['BARRIO']
+        except KeyError:
+            barrio = "No disponible"
+        try:
+            distrito = museos[museo]['DISTRITO']
+        except KeyError:
+            distrito = "No disponible"
+        try:
+            cx = museos[museo]['COORDENADA-X']
+        except KeyError:
+            cx = "No disponible"
+        try:
+            cy = museos[museo]['COORDENADA-Y']
+        except KeyError:
+            cy = "No disponible"
+        try:
+            latitud = museos[museo]['LATITUD']
+        except KeyError:
+            latitud = "No disponible"
+        try:
+            longitud = museos[museo]['LONGITUD']
+        except KeyError:
+            longitud = "No disponible"
+        try:
+            tlf = museos[museo]['TELEFONO']
+        except KeyError:
+            tlf = "No disponible"
+        try:
+            fax = museos[museo]['FAX']
+        except KeyError:
+            fax = "No disponible"
+        try:
+            email = museos[museo]['EMAIL']
+        except KeyError:
+            email = "No disponible"
+
+        m = Museo(ID_ENTIDAD=id_entidad, NOMBRE=nombre, DESCRIPCION=descripcion,
+            HORARIO=horario, TRANSPORTE=transporte, ACCESIBILIDAD=accesibilidad,
+            CONTENT_URL=url, NOMBRE_VIA=nombre_via, CLASE_VIAL=clase_vial,
+            TIPO_NUM=tipo_num, NUM=num, LOCALIDAD=localidad, PROVINCIA=provincia,
+            CODIGO_POSTAL = cp, BARRIO=barrio, DISTRITO=distrito,
+            COORDENADA_X=cx, COORDENADA_Y=cy, LATITUD = latitud,
+            LONGITUD= longitud, TELEFONO=tlf, FAX=fax, EMAIL=email)
+        m.save()
+
+    return redirect("/")
 
 # Muestro el listado de museos
 def listar(request):
+    distritos = Museo.objects.values('DISTRITO').distinct()
+    lista = []
+    Dist_select = "Elige un distrito"
+    for distrito in distritos:
+        lista.append(str(distrito).split(':')[1][2:-2])
 
     # Compruebo si hay búsqueda de distrito
     if request.method == "GET" and 'Distrito' in request.GET:
         if request.GET['Distrito'] != "":
-            museos = Museo.objects.filter(distrito=str(request.GET["Distrito"]))
+            Dist_select = request.GET['Distrito']
+            museos = Museo.objects.filter(DISTRITO=str(request.GET["Distrito"]))
         else:
             return HttpResponseNotFound ("No hay museos en ese distrito")
 
@@ -97,8 +209,10 @@ def listar(request):
     else:
         museos = Museo.objects.all()
 
+        #return HttpResponse(lista)
     return render_to_response('web/museos.html', {'Titulo': 'Listado de museos',
-        'museos': museos, 'formato': get_formato(request)},
+        'museos': museos, 'formato': get_formato(request),
+        'distritos': lista, 'Dist_select': Dist_select},
         context_instance=RequestContext(request))
 
 
@@ -112,7 +226,7 @@ def mostrar_museo(request, id):
     except Museo.DoesNotExist:
         return HttpResponseNotFound("El museo no existe.")
 
-    # Compruebo si se ha rellenado ualgún formulario
+    # Compruebo si se ha rellenado algún formulario
     if request.method == "POST":
         usuario = request.user.username
         try:
@@ -124,13 +238,13 @@ def mostrar_museo(request, id):
         if 'Comentario' in request.POST:
             if request.POST["Comentario"] != "":
                 comentario = Comentario(texto=request.POST["Comentario"],
-                                        usuario=usuario, museo=Museo.objects.get(id=id))
+                    museo=Museo.objects.get(id=id))
                 comentario.save()
 
         #Compruebo si el museo está añadido a favoritos
-        else:
-            for museo in Favorito.objects.filter(usuario=usuario):
-                if museo == Museo.objects.get(id=id):
+        elif 'Add' in request.POST:
+            for favorito in  Museo.objects.filter(favorito__usuario=usuario):
+                if favorito == Museo.objects.get(id=id):
                     return HttpResponseNotFound("El museo ya está añadido")
 
             f = Favorito(museo=Museo.objects.get(id=id), usuario=usuario)
@@ -156,7 +270,7 @@ def usuario(request, usuario, d1=0, d2=5):
     if request.method == "POST" and request.user.is_authenticated():
         if 'Titulo' in request.POST:
             usuario.titulo = request.POST['Titulo']
-        elif 'Letra' in rquest.POST['Letra'] and 'Color' in request.POST['Color']:
+        elif 'Letra' in request.POST and 'Color' in request.POST:
             usuario.letra = request.POST['Letra']
             usuario.color = request.POST['Color']
 
@@ -192,7 +306,7 @@ def mostrar_xml(request, usuario):
         return HttpResponseNotFound("Usuario inexistente.")
 
     return render_to_response('xml/xml_tmp.xml', {'nombre': str(usuario.nombre),
-    'museos': usuario.museos.all()}, content_type='text/xml')
+    'museos': Museo.objects.filter(favorito__usuario=usuario)}, content_type='text/xml')
 
 # From https://stackoverflow.com/questions/25274104/logout-page-not-working-in-django
 def logoutUser(request):

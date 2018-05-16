@@ -26,7 +26,7 @@ urlpatterns = [
     url(r'^logout', 'museos.views.logoutUser'),
     url(r'^login', 'museos.views.loginUser'),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^xml$', 'museos.views.get_xml'),
+    url(r'^bd$', 'museos.views.get_bd'),
     url(r'^museos$', 'museos.views.listar'),
     url(r'^museos/(\d+)$', 'museos.views.mostrar_museo'),
     url(r'^(\w+)$', 'museos.views.usuario'),

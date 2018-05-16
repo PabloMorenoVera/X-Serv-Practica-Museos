@@ -10,15 +10,20 @@
 
 {% block distrito %}
 <form method="GET" action="/museos">
-	<input type="text" class="text" maxlength="64" name="Distrito" />
-	<input type="submit" class="submit" value="Search" />
+  <select name="Distrito" class="Combobox">
+		<option style="display:none" selected="selected">{{ Dist_select }}</option>
+		{% for distrito in distritos %}
+    <option value="{{ distrito }}">{{ distrito }}</option>
+		{% endfor %}
+  </select>
+  <input type="submit" class="submit" value="Submit" >
 </form>
 {% endblock %}
 
 {% block museos %}
 	{% for museo in museos %}
 		<div class="post">
-			<h4> {{ museo.nombre }} <a href="{{ museo.url }}">Página del museo</a></h4>
+			<h4> {{ museo.NOMBRE }} <a href="{{ museo.CONTENT_URL }}">Página del museo</a></h4>
 		</div>
 
 		<div class="divider2"></div>
