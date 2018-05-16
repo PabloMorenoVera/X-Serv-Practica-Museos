@@ -2,7 +2,7 @@
 from django.shortcuts import render
 from django.shortcuts import render_to_response
 
-from .models import Museo, Usuario, Comentario
+from .models import Museo, Usuario, Comentario, Favorito
 
 # From https://code.djangoproject.com/ticket/1494 and https://stackoverflow.com/questions/44185354/django-tutorial-name-httpresponse-is-not-defined
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
@@ -106,29 +106,35 @@ def listar(request):
 @csrf_exempt
 def mostrar_museo(request, id):
     add = ""
+    # Compruebo si el museo existe
     try:
         museo = Museo.objects.get(id=id)
     except Museo.DoesNotExist:
         return HttpResponseNotFound("El museo no existe.")
 
+    # Compruebo si se ha rellenado ualgún formulario
     if request.method == "POST":
         usuario = request.user.username
-        usuario = Usuario.objects.get(nombre=usuario)
+        try:
+            usuario = Usuario.objects.get(nombre=usuario)
+        except Usuario.DoesNotExist:
+            return HttpResponseNotFound("Debes estar logueado.")
 
-        #Comrpuebo si han añadido un comentario
+        #Compruebo si han añadido un comentario
         if 'Comentario' in request.POST:
             if request.POST["Comentario"] != "":
                 comentario = Comentario(texto=request.POST["Comentario"],
                                         usuario=usuario, museo=Museo.objects.get(id=id))
                 comentario.save()
 
+        #Compruebo si el museo está añadido a favoritos
         else:
-            #Compruebo si el museo está añadido a favoritos
-            for museo in usuario.museos.all():
+            for museo in Favorito.objects.filter(usuario=usuario):
                 if museo == Museo.objects.get(id=id):
                     return HttpResponseNotFound("El museo ya está añadido")
 
-            usuario.museos.add(Museo.objects.get(id=id))
+            f = Favorito(museo=Museo.objects.get(id=id), usuario=usuario)
+            f.save()
             add = "Museo añadido."
 
     comentarios = Comentario.objects.filter(museo=Museo.objects.get(id=id))
@@ -147,7 +153,7 @@ def usuario(request, usuario, d1=0, d2=5):
         return HttpResponseNotFound("Usuario inexistente.")
 
     # Actualizo el valor del formulario
-    if request.method == "POST":
+    if request.method == "POST" and request.user.is_authenticated():
         if 'Titulo' in request.POST:
             usuario.titulo = request.POST['Titulo']
         elif 'Letra' in rquest.POST['Letra'] and 'Color' in request.POST['Color']:
@@ -157,12 +163,13 @@ def usuario(request, usuario, d1=0, d2=5):
         usuario.save()
 
     # Muestro los museos de la página que corresponde
-    museos = usuario.museos.annotate()[int(d1):int(d2)]
+    # From https://stackoverflow.com/questions/1981524/django-filtering-on-foreign-key-properties
+    museos = Museo.objects.filter(favorito__usuario=usuario).annotate()[int(d1):int(d2)]
 
     # Escribo las páginas con museos
     j = 1
     pages = ""
-    for i in range(0,int(ceil(usuario.museos.count()/5))):
+    for i in range(0,int(ceil(Favorito.objects.filter(usuario=usuario).count()/5))):
         pages += "<a href='http://localhost:8000/" + str(usuario.nombre) + "/" + str(i*5) + "-" + str(i*5+5) + "'>" + str(j) + "</a> "
         j += 1
 

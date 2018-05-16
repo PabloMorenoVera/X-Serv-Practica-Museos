@@ -3,16 +3,18 @@
 {% block menu %}
 <ul>
 	<li><a href="/">Inicio</a></li>
-	<li><a href="/museos">Museos</a></li>
+	<li><a href="/museos">Todos</a></li>
 	<li><a href="/about">About</a></li>
 </ul>
 {% endblock %}
 
-{%block añadir %}
-<form action="/museos/{{ museo.id }}" method="POST">{% csrf_token %}
-	<input type="hidden" name="Add" value="Si">
-		<input type="submit" value="Añadir" class="submit">
-</form>
+{% block añadir %}
+	{% if user.is_authenticated %}
+		<form action="/museos/{{ museo.id }}" method="POST">{% csrf_token %}
+			<input type="hidden" name="Add" value="Si">
+				<input type="submit" value="Añadir" class="submit">
+		</form>
+	{% endif %}
 {% endblock %}
 
 {% block museo %}
@@ -44,14 +46,16 @@
 	<h2> Comentarios: </h2>
 	{% for comentario in comentarios %}
 		<div class="coments">
-			<h4> {{ comentario.usuario }}: {{ comentario.texto }}</h4>
+			<h4>{{ comentario.texto }}</h4>
 		</div>
 	{% endfor %}
 {% endblock %}
 
 {% block Comentario %}
-<form method="POST" action="/museos/{{ museo.id }}">{% csrf_token %}
-	<h2><input type="text" class="text" size="87" name="Comentario" value=""/>
-	<input type="submit" class="submit" value="Comentar" /></h2>
-</form>
+	{% if user.is_authenticated %}
+		<form method="POST" action="/museos/{{ museo.id }}">{% csrf_token %}
+			<h2><input type="text" class="text" size="87" name="Comentario" value=""/>
+			<input type="submit" class="submit" value="Comentar" /></h2>
+		</form>
+	{% endif %}
 {% endblock %}
