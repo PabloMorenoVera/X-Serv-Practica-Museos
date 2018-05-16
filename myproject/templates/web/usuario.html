@@ -12,10 +12,8 @@
 <div class="post">
 	<h3> Nombre: {{ usuario.nombre }}</h3>
 	<div class="divider2"></div>
-	<h2> Fecha: {{ usuario.fecha }}</h2>
-	<div class="divider2"></div>
 
-	{% if user.is_authenticated %}
+	{% if user.is_authenticated and usuario.nombre == user.get_username %}
 		<form method="POST" action="/{{ usuario.nombre }}">{% csrf_token %}
 			<h2><label for="uname">Título: </label>
 			<input type="text" class="text" name="Titulo" value="{{ usuario.titulo }}"/>
@@ -46,7 +44,11 @@
       <h4> {{ museo.nombre }} <a href="{{ museo.url }}">Página del museo</a></h4>
       <ul class="controls">
         <li>Dirección: {{ museo.direccion }}</li><br>
-				<li>Fecha: {{ museo.direccion }}</li><br>
+				{% for favorito in favoritos %}
+					{% if favorito.museo.nombre = museo.nombre %}
+						<li>Fecha: {{ favorito.fecha }}</li><br>
+					{% endif %}
+				{% endfor %}
         <li><a href="/museos/{{ museo.id }}" class="more">Más información</a></li>
       </ul>
     </div>

@@ -165,6 +165,7 @@ def usuario(request, usuario, d1=0, d2=5):
     # Muestro los museos de la página que corresponde
     # From https://stackoverflow.com/questions/1981524/django-filtering-on-foreign-key-properties
     museos = Museo.objects.filter(favorito__usuario=usuario).annotate()[int(d1):int(d2)]
+    favoritos = Favorito.objects.filter(usuario=usuario)
 
     # Escribo las páginas con museos
     j = 1
@@ -175,12 +176,12 @@ def usuario(request, usuario, d1=0, d2=5):
 
     if usuario.titulo == "":
         return render_to_response('web/usuario.html', {'Titulo': "Página de " + usuario.nombre,
-            'usuario': usuario, 'museos': museos, 'pages': pages, 'formato': get_formato(request)},
-            context_instance=RequestContext(request))
+            'usuario': usuario, 'museos': museos, 'pages': pages, 'formato': get_formato(request),
+            'favoritos': favoritos}, context_instance=RequestContext(request))
     else:
         return render_to_response('web/usuario.html', {'Titulo': usuario.titulo,
-            'usuario': usuario, 'museos': museos, 'pages': pages, 'formato': get_formato(request)},
-            context_instance=RequestContext(request))
+            'usuario': usuario, 'museos': museos, 'pages': pages, 'formato': get_formato(request),
+            'favoritos': favoritos}, context_instance=RequestContext(request))
 
 
 # Muestro el xml del usuario
