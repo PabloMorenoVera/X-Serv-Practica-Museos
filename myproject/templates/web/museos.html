@@ -23,9 +23,39 @@
 {% block museos %}
 	{% for museo in museos %}
 		<div class="post">
-			<h4> {{ museo.NOMBRE }} <a href="{{ museo.CONTENT_URL }}">Página del museo</a></h4>
+			<h4> {{ museo.NOMBRE }}</h4><br>
+			<a href="/museos/{{ museo.id }}">Página del museo</a>
 		</div>
 
 		<div class="divider2"></div>
 	{% endfor %}
+{% endblock %}
+
+<!-- API's settings from: https://churchthemes.com/page-didnt-load-google-maps-correctly/
+			and code from: https://www.w3schools.com/html/tryit.asp?filename=tryhtml_google_map_4 -->
+{% block map %}
+<div id="map" style="width:90%;height:50%;background:yellow"></div>
+<script>
+var map;
+function myMap() {
+  map = new google.maps.Map(document.getElementById("map"),{
+    center: new google.maps.LatLng(40.4293538, -3.6827461),
+    zoom: 11,
+		mapTypeId: google.maps.MapTypeId.HYBRID,
+  });
+}
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAxrjQO0yzyKxay161unU4kQ1eQ7ySFLPY&callback=myMap"></script>
+{% for museo in museos %}
+	<script>
+	var marker;
+	// From https://www.w3schools.com/js/js_comparisons.asp
+	if ({{museo.LATITUD}} != "N/D" && {{museo.LONGITUD}} != "N/D") {
+		marker = new google.maps.Marker({
+			position: new google.maps.LatLng({{ museo.LATITUD }}, {{ museo.LONGITUD }}),
+			map: map,
+		});
+	}
+	</script>
+{% endfor %}
 {% endblock %}

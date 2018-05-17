@@ -52,7 +52,8 @@ def home(request, d1=0, d2=5):
             accesible = request.GET["Accesible"]
             museos = Museo.objects.filter(ACCESIBILIDAD=accesible)
         else:
-            return HttpResponseNotFound ("No hay museos accesibles")
+            return render_to_response('web/error.html', {'Mensaje': "No hay museos accesibles",
+                'formato': get_formato(request)}, context_instance=RequestContext(request))
 
         return render_to_response('web/inicio.html', {'Titulo': 'Listado de museos',
             'museos': museos, 'paginas': Usuario.objects.all(),
@@ -79,104 +80,101 @@ def home(request, d1=0, d2=5):
 
 # Descargo el xml de la página
 def get_bd(request):
-
-    #xml = urllib.request.urlopen("https://datos.madrid.es/portal/site/egob/menuitem.ac61933d6ee3c31cae77ae7784f1a5a0/?vgnextoid=00149033f2201410VgnVCM100000171f5a0aRCRD&format=xml&file=0&filename=201132-0-museos&mgmtid=118f2fdbecc63410VgnVCM1000000b205a0aRCRD&preview=full")
-    #return HttpResponse(xml, content_type='text/xml')
     museos = XML_parser(XML_File=urllib.request.urlopen("https://datos.madrid.es/portal/site/egob/menuitem.ac61933d6ee3c31cae77ae7784f1a5a0/?vgnextoid=00149033f2201410VgnVCM100000171f5a0aRCRD&format=xml&file=0&filename=201132-0-museos&mgmtid=118f2fdbecc63410VgnVCM1000000b205a0aRCRD&preview=full"))
 
     for museo in museos:
         try:
             id_entidad = museos[museo]['ID-ENTIDAD']
         except KeyError:
-            id_entidad = "No disponible"
+            id_entidad = "N/D"
         try:
             nombre = museos[museo]['NOMBRE']
         except KeyError:
-            nombre = "No disponible"
+            nombre = "N/D"
         try:
             descripcion = museos[museo]['DESCRIPCION']
         except KeyError:
-            descripcion = "No disponible"
+            descripcion = "N/D"
         try:
             horario = museos[museo]['HORARIO']
         except KeyError:
-            horario = "No disponible"
+            horario = "N/D"
         try:
             transporte = museos[museo]['TRANSPORTE']
         except KeyError:
-            transporte = "No disponible"
+            transporte = "N/D"
         try:
             accesibilidad = museos[museo]['ACCESIBILIDAD']
         except KeyError:
-            accesibilidad = "No disponible"
+            accesibilidad = "N/D"
         try:
             url = museos[museo]['CONTENT-URL']
         except KeyError:
-            url = "No disponible"
+            url = "N/D"
         try:
             nombre_via = museos[museo]['NOMBRE-VIA']
         except KeyError:
-            nombre_via = "No disponible"
+            nombre_via = "N/D"
         try:
             clase_vial = museos[museo]['CLASE-VIAL']
         except KeyError:
-            clase_vial = "No disponible"
+            clase_vial = "N/D"
         try:
             tipo_num = museos[museo]['TIPO-NUM']
         except KeyError:
-            tipo_num = "No disponible"
+            tipo_num = "N/D"
         try:
             num = museos[museo]['NUM']
         except KeyError:
-            num = "No disponible"
+            num = "N/D"
         try:
             localidad = museos[museo]['LOCALIDAD']
         except KeyError:
-            localidad = "No disponible"
+            localidad = "N/D"
         try:
             provincia = museos[museo]['PROVINCIA']
         except KeyError:
-            provincia = "No disponible"
+            provincia = "N/D"
         try:
             cp = museos[museo]['CODIGO-POSTAL']
         except KeyError:
-            cp = "No disponible"
+            cp = "N/D"
         try:
             barrio = museos[museo]['BARRIO']
         except KeyError:
-            barrio = "No disponible"
+            barrio = "N/D"
         try:
             distrito = museos[museo]['DISTRITO']
         except KeyError:
-            distrito = "No disponible"
+            distrito = "N/D"
         try:
             cx = museos[museo]['COORDENADA-X']
         except KeyError:
-            cx = "No disponible"
+            cx = "N/D"
         try:
             cy = museos[museo]['COORDENADA-Y']
         except KeyError:
-            cy = "No disponible"
+            cy = "N/D"
         try:
             latitud = museos[museo]['LATITUD']
         except KeyError:
-            latitud = "No disponible"
+            latitud = "N/D"
         try:
             longitud = museos[museo]['LONGITUD']
         except KeyError:
-            longitud = "No disponible"
+            longitud = "N/D"
         try:
             tlf = museos[museo]['TELEFONO']
         except KeyError:
-            tlf = "No disponible"
+            tlf = "N/D"
         try:
             fax = museos[museo]['FAX']
         except KeyError:
-            fax = "No disponible"
+            fax = "N/D"
         try:
             email = museos[museo]['EMAIL']
         except KeyError:
-            email = "No disponible"
+            email = "N/D"
 
         m = Museo(ID_ENTIDAD=id_entidad, NOMBRE=nombre, DESCRIPCION=descripcion,
             HORARIO=horario, TRANSPORTE=transporte, ACCESIBILIDAD=accesibilidad,
@@ -193,6 +191,7 @@ def get_bd(request):
 def listar(request):
     distritos = Museo.objects.values('DISTRITO').distinct()
     lista = []
+    markers = []
     Dist_select = "Elige un distrito"
     for distrito in distritos:
         lista.append(str(distrito).split(':')[1][2:-2])
@@ -203,16 +202,17 @@ def listar(request):
             Dist_select = request.GET['Distrito']
             museos = Museo.objects.filter(DISTRITO=str(request.GET["Distrito"]))
         else:
-            return HttpResponseNotFound ("No hay museos en ese distrito")
+            return render_to_response ('web/error.html', {'Mensaje': "No hay museos en ese distrito",
+                'formato': get_formato(request)}, context_instance=RequestContext(request))
 
     # Si no la hay muestro todos los museos
     else:
-        museos = Museo.objects.all()
+        museos = list(Museo.objects.all())
 
         #return HttpResponse(lista)
     return render_to_response('web/museos.html', {'Titulo': 'Listado de museos',
-        'museos': museos, 'formato': get_formato(request),
-        'distritos': lista, 'Dist_select': Dist_select},
+        'museos': museos, 'formato': get_formato(request),'distritos': lista,
+        'Dist_select': Dist_select},
         context_instance=RequestContext(request))
 
 
@@ -224,7 +224,8 @@ def mostrar_museo(request, id):
     try:
         museo = Museo.objects.get(id=id)
     except Museo.DoesNotExist:
-        return HttpResponseNotFound("El museo no existe.")
+        return render_to_response ('web/error.html', {'Mensaje': "El museo no existe",
+            'formato': get_formato(request)}, context_instance=RequestContext(request))
 
     # Compruebo si se ha rellenado algún formulario
     if request.method == "POST":
@@ -232,7 +233,8 @@ def mostrar_museo(request, id):
         try:
             usuario = Usuario.objects.get(nombre=usuario)
         except Usuario.DoesNotExist:
-            return HttpResponseNotFound("Debes estar logueado.")
+            return render_to_response ('web/error.html', {'Mensaje': "Debes estar logueado",
+                'formato': get_formato(request)}, context_instance=RequestContext(request))
 
         #Compruebo si han añadido un comentario
         if 'Comentario' in request.POST:
@@ -245,7 +247,8 @@ def mostrar_museo(request, id):
         elif 'Add' in request.POST:
             for favorito in  Museo.objects.filter(favorito__usuario=usuario):
                 if favorito == Museo.objects.get(id=id):
-                    return HttpResponseNotFound("El museo ya está añadido")
+                    return render_to_response ('web/error.html', {'Mensaje': "El museo ya está añadido",
+                        'formato': get_formato(request)}, context_instance=RequestContext(request))
 
             f = Favorito(museo=Museo.objects.get(id=id), usuario=usuario)
             f.save()
@@ -264,7 +267,7 @@ def usuario(request, usuario, d1=0, d2=5):
         # Extraigo el usuario del URL
         usuario = Usuario.objects.get(nombre = usuario)
     except Usuario.DoesNotExist:
-        return HttpResponseNotFound("Usuario inexistente.")
+        return HttpResponseNotFound("Error 404. Usuario inexistente.")
 
     # Actualizo el valor del formulario
     if request.method == "POST" and request.user.is_authenticated():
@@ -323,4 +326,5 @@ def loginUser(request):
            login(request, user)
            return HttpResponseRedirect('/')
        else:
-           return HttpResponseNotFound("Usuario Incorrecto")
+           return render_to_response ('web/error.html', {'Mensaje': "Usuario Incorrecto",
+            'formato': get_formato(request)}, context_instance=RequestContext(request))

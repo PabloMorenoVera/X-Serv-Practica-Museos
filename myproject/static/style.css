@@ -362,13 +362,13 @@ vertical-align: middle;
 #primarycontainer
 {
 float: left;
-margin-right: -18.0em;
+margin-right: -30.0em;
 width: 100%;
 }
 
 #primarycontent
 {
-margin: 1.5em 22.0em 0em 0em;
+margin: 1.5em 40.0em 0em 0em;
 }
 
 #primarycontent h3
@@ -396,7 +396,7 @@ vertical-align: middle;
 {
 margin-top: 1.5em;
 float: right;
-width: 18.0em;
+width: 30.0em;
 }
 
 #footer

@@ -76,3 +76,25 @@
 		</form>
 	{% endif %}
 {% endblock %}
+
+<!-- API's settings from: https://churchthemes.com/page-didnt-load-google-maps-correctly/
+			and code from: https://www.w3schools.com/html/tryit.asp?filename=tryhtml_google_map_4 -->
+{% block map %}
+<div id="map" style="width:90%;height:50%;background:yellow"></div>
+<script>
+function myMap() {
+  var map = new google.maps.Map(document.getElementById("map"),{
+    center: new google.maps.LatLng({{ museo.LATITUD }}, {{ museo.LONGITUD }}),
+    zoom: 17,
+		mapTypeId: google.maps.MapTypeId.HYBRID,
+  });
+
+	var marker = new google.maps.Marker({
+    position: {lat: {{ museo.LATITUD }}, lng: {{ museo.LONGITUD }}},
+    map: map,
+  });
+
+}
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAxrjQO0yzyKxay161unU4kQ1eQ7ySFLPY&callback=myMap"></script>
+{% endblock %}

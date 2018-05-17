@@ -61,6 +61,7 @@
 					<h1>{{ Titulo }}</h1>
 					<div class="contentarea">
 						<!-- Normal content area start -->
+						{% block cargar_bd %} {% endblock %}
 						{% block añadir %} {% endblock %}
 						{{ add }}
 						<!-- Normal content area end -->
@@ -75,6 +76,7 @@
 				<div id="primarycontainer">
 					<div id="primarycontent">
 						<!-- Primary content area start -->
+						{% block error %} {% endblock %}
 						{% block museos %} {% endblock %}
 						{% block museo %} {% endblock %}
 						{% block usuario %} {% endblock %}
@@ -84,11 +86,19 @@
 						<div id="pages">
 							<div class="post">
 								{% block pages%} {% endblock %}
+
 							</div>
 						</div>
 						<!-- Primary content area end -->
 
 					</div>
+				</div>
+
+				<!-- Secondary content: Stuff that goes in the secondary content column (by default, the narrower right column) -->
+				<div id="secondarycontent">
+					<!-- Secondary content area start -->
+					{% block map %} {% endblock %}
+					<!-- Secondary content area end -->
 				</div>
 
 				{% block paginas_personales %} {% endblock %}
