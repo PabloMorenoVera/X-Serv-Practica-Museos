@@ -4,6 +4,13 @@
 <ul>
 	<li><a href="/">Inicio</a></li>
 	<li><a href="/museos">Todos</a></li>
+	{% if user.is_authenticated %}
+		{% if usuario.nombre == user.get_username %}
+			<li><a href="/{{user.get_username}}" class="active">Mi Página</a></li>
+		{% else %}
+			<li><a href="/{{user.get_username}}">Mi Página</a></li>
+		{% endif %}
+	{% endif %}
 	<li><a href="/about">About</a></li>
 </ul>
 {% endblock %}

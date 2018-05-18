@@ -17,6 +17,8 @@ from django.contrib import admin
 from django.contrib.auth.views import logout
 from django.contrib.auth.views import login
 from django.views.static import serve
+from django.views.generic.edit import CreateView
+from django.contrib.auth.forms import UserCreationForm
 
 urlpatterns = [
     url(r'media/(.*)$', serve, {'document_root': 'templates/web'}),
@@ -25,10 +27,16 @@ urlpatterns = [
     # From https://stackoverflow.com/questions/25274104/logout-page-not-working-in-django
     url(r'^logout', 'museos.views.logoutUser'),
     url(r'^login', 'museos.views.loginUser'),
+    # From https://stackoverflow.com/questions/43696088/django-redirect-to-a-page-after-registering-a-user
+    url(r'^register', CreateView.as_view(
+            template_name='web/registrar.html',
+            form_class=UserCreationForm,
+            success_url='/')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^bd$', 'museos.views.get_bd'),
     url(r'^museos$', 'museos.views.listar'),
     url(r'^museos/(\d+)$', 'museos.views.mostrar_museo'),
+    url(r'^about$', 'museos.views.about'),
     url(r'^(\w+)$', 'museos.views.usuario'),
     url(r'^(\w+)/(\d+)-(\d+)$', 'museos.views.usuario'),
     url(r'^(\w+)/xml$', 'museos.views.mostrar_xml')

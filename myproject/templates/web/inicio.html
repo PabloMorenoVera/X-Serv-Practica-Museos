@@ -4,27 +4,30 @@
 <ul>
 	<li><a href="/" class="active">Inicio</a></li>
 	<li><a href="/museos">Todos</a></li>
+	{% if user.is_authenticated %}
+		<li><a href="/{{user.get_username}}">Mi Página</a></li>
+	{% endif %}
 	<li><a href="/about">About</a></li>
 </ul>
 {% endblock %}
 
-{% block boton_accesibles %}
-	{% if accesible == 0 %}
-	<form action="/" method="GET">
-		<input type="hidden" name="Accesible" value="1">
-			<input type="submit" value="Accesibles" class="submit">
-	</form>
+{% block cargar_bd %}
+	{% if bd == True %}
+		<form action="/bd" method="GET">
+				<input type="submit" value="Cargar_BD" class="submit">
+		</form>
 	{% else %}
-		<form action="" method="GET">
+		{% if accesible == 0 %}
+		<form action="/" method="GET">
+			<input type="hidden" name="Accesible" value="1">
 				<input type="submit" value="Accesibles" class="submit">
 		</form>
+		{% else %}
+			<form action="" method="GET">
+					<input type="submit" value="Accesibles" class="submit">
+			</form>
+		{% endif %}
 	{% endif %}
-{% endblock %}
-
-{% block cargar_bd %}
-<form action="/bd" method="GET">
-		<input type="submit" value="Cargar_BD" class="submit">
-</form>
 {% endblock %}
 
 {% block museos %}

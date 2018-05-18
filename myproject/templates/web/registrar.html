@@ -4,13 +4,13 @@
 <ul>
 	<li><a href="/">Inicio</a></li>
 	<li><a href="/museos">Todos</a></li>
-	{% if user.is_authenticated %}
-		<li><a href="/{{user.get_username}}">Mi Página</a></li>
-	{% endif %}
 	<li><a href="/about">About</a></li>
 </ul>
 {% endblock %}
 
-{% block error %}
-<p>{{ Mensaje }}</p>
+{% block register %}
+<form method="POST" action="/register">{% csrf_token %}
+  {{ form.as_p }}
+  <input type="submit" value="register" class="submit"/>
+</form>
 {% endblock %}

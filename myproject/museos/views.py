@@ -7,13 +7,13 @@ from .models import Museo, Usuario, Comentario, Favorito
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 
-from django.contrib.auth import authenticate, login
-from django.contrib.auth import logout
+from django.contrib.auth import authenticate, login, logout
+# From https://stackoverflow.com/questions/23139657/django-get-all-users
+from django.contrib.auth.models import User
 
 from django.template.loader import get_template
-from django.template import Context
 # From https://lincolnloop.com/blog/getting-requestcontext-your-templates/
-from django.template import RequestContext
+from django.template import Context, RequestContext
 
 import urllib.parse
 import urllib.request
@@ -26,7 +26,7 @@ from django.db.models import Count
 from math import ceil
 from museos.parser import XML_parser
 
-atributos = []
+bd = True
 
 def get_formato(request):
     if request.user.is_authenticated():
@@ -45,6 +45,18 @@ def get_formato(request):
 
 # Página principal "/"
 def home(request, d1=0, d2=5):
+    global bd
+
+    #Compruebo si están todos los usuario registrados
+    users = User.objects.all()
+    for user in users:
+        try:
+            Usuario.objects.get(nombre=user)
+        # Si no lo están los añado
+        except Usuario.DoesNotExist:
+            u = Usuario(nombre=user, letra=1, color="white", titulo="")
+            u.save()
+
     museos_totales = Museo.objects.all()
     # Compruebo si está selecccionado el botón de accesibles
     if request.method == "GET" and 'Accesible' in request.GET:
@@ -57,12 +69,12 @@ def home(request, d1=0, d2=5):
 
         return render_to_response('web/inicio.html', {'Titulo': 'Listado de museos',
             'museos': museos, 'paginas': Usuario.objects.all(),
-            'accesible': accesible, 'formato': get_formato(request)},
+            'accesible': accesible, 'formato': get_formato(request), 'bd': bd},
             context_instance=RequestContext(request))
 
     # Si no está seleccionado muestro los 5 museos
     #From https://docs.djangoproject.com/en/1.8/topics/db/examples/many_to_one/
-    museos = Museo.objects.annotate(count=Count('comentario__museo')).order_by('-count').annotate()[int(d1):int(d2)]
+    museos = Museo.objects.annotate(count=Count('comentario__museo')).order_by('-count')[int(d1):int(d2)]
 
     # Escribo las páginas con museos
     accesible = 0
@@ -74,12 +86,13 @@ def home(request, d1=0, d2=5):
 
     return render_to_response('web/inicio.html', {'Titulo': 'Inicio',
         'museos': museos, 'pages': pages, 'paginas': Usuario.objects.all(),
-        'accesible': accesible, 'formato': get_formato(request)},
+        'accesible': accesible, 'formato': get_formato(request), 'bd': bd},
         context_instance=RequestContext(request))
 
 
 # Descargo el xml de la página
 def get_bd(request):
+    global bd
     museos = XML_parser(XML_File=urllib.request.urlopen("https://datos.madrid.es/portal/site/egob/menuitem.ac61933d6ee3c31cae77ae7784f1a5a0/?vgnextoid=00149033f2201410VgnVCM100000171f5a0aRCRD&format=xml&file=0&filename=201132-0-museos&mgmtid=118f2fdbecc63410VgnVCM1000000b205a0aRCRD&preview=full"))
 
     for museo in museos:
@@ -185,6 +198,7 @@ def get_bd(request):
             LONGITUD= longitud, TELEFONO=tlf, FAX=fax, EMAIL=email)
         m.save()
 
+    bd = False
     return redirect("/")
 
 # Muestro el listado de museos
@@ -314,17 +328,22 @@ def mostrar_xml(request, usuario):
 # From https://stackoverflow.com/questions/25274104/logout-page-not-working-in-django
 def logoutUser(request):
    logout(request)
-   return HttpResponseRedirect('/')
+   # From https://stackoverflow.com/questions/12758786/redirect-return-to-same-previous-page-in-django/12758859
+   return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 # From https://stackoverflow.com/questions/20208562/homepage-login-form-django
 def loginUser(request):
     if request.POST:
-       usuario = request.POST['user']
-       contraseña = request.POST['psswd']
-       user = authenticate(username=usuario, password=contraseña)
-       if user is not None:
-           login(request, user)
-           return HttpResponseRedirect('/')
-       else:
-           return render_to_response ('web/error.html', {'Mensaje': "Usuario Incorrecto",
-            'formato': get_formato(request)}, context_instance=RequestContext(request))
+        usuario = request.POST['user']
+        contraseña = request.POST['psswd']
+        user = authenticate(username=usuario, password=contraseña)
+        if user is not None:
+            login(request, user)
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+        else:
+            return render_to_response ('web/error.html', {'Mensaje': "Usuario Incorrecto",
+                'formato': get_formato(request)}, context_instance=RequestContext(request))
+
+def about(request):
+    return render_to_response('web/about.html', {'Titulo': "About", 'formato': get_formato(request)},
+        context_instance=RequestContext(request))

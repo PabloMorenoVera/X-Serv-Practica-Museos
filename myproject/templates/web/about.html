@@ -1,0 +1,63 @@
+{% extends "web/index.html" %}
+
+{% block menu %}
+<ul>
+	<li><a href="/">Inicio</a></li>
+	<li><a href="/museos">Todos</a></li>
+	{% if user.is_authenticated %}
+		<li><a href="/{{user.get_username}}">Mi Página</a></li>
+	{% endif %}
+	<li><a href="/about" class="active">About</a></li>
+</ul>
+{% endblock %}
+
+{% block about %}
+<ul>
+  <li><h3>Autoría de la práctica</h3></li><br>
+    <h4>Pablo Moreno Vera</h4><br><br>
+
+  <li><h3>Funcionamiento</h3></li><br>
+    <h4>Objetos comunes</h4><br>
+    <p>En este apartado se comentarán objetos del sitio que aparecen en todas las páginas.</p>
+
+    <h5>Banner</h5>
+    <p>El banner de la página se muestra en la parte superior izquierda de la pantalla.</p>
+
+    <h5>Login</h5>
+    <p>El login aparece en la parte superior derecha de la pantalla y consta de un formulario con dos campos, uno para el nombre y otro para la contraseña. Además tiene un botón "login" para envíar la información del formulario.
+    Una vez pulsado el botón se comprobará el login y, de ser correcto, redireccionará al usuario a la página en la que se encontraba.</p>
+
+    <h5>Register</h5>
+    <p>El registro de usuario se encuentra en la parte superior izquierda de la pantalla, justo debajo del login. Se trata de un botón que nos redirigirá a una ṕagina de registro de usuario donde se introducirá el nombre y la contraseña.
+    Una vez dado de alta el usuario, redirigirá al usuario a la página principal del sitio.</p>
+
+    <h5>Menú</h5>
+    <p>El menú se encuentra en la parte superior de la página justo debajo del banner y mostrará las opciones "Inicio", "Todos", "Mi Página" y "About". En caso de encontrarse en alguna de esas opciones, se encontrará resaltado en el menú.
+    Si pulsamos sobre cualquiera de esas opciones, no redirigirá a ellas.</p>
+
+    <h5>Título</h5>
+    <p>El título de cada página se encuentra justo debajo del menú y nos indica la página en la que nos encontramos.</p>
+
+    <h4>Página "Inicio"</h4>
+    <br><p>En la página se puede ver un listado de 5 museos. Estos se encuentran ordenados en función de la cantidad de comentario que tienen. En caso de que ningún museo tenga comentarios, muestra los museos por orden según la base de datos. Para cada museo se muestra su nombre, un enlace a la página del ayuntamiento de madrid con el museo, la dirección del museo y un enlace con el nombre "Más información" a la página del museo en el sitio.
+    En la parte superior, justo debajo del menú, se puede apreciar el título de la página y en su parte inferior el botón "Accesibles", que muestra un listado de los museos que son accesibles para personas con discapacidad.
+    En parte derecha de la pantalla se puede apreciar el listado con las páginas personales de los usuarios.
+    En la parte inferior de la página se puede apreciar un listado de números con todos los museos que existen en la base de datos.</p>
+
+    <h4>Página "Todos"</h4>
+    <br><p>En la parte superior de la página, debajo del título, aparece un "ComboBox" para filtrar los museos por distrito en el que están ubicados. Para ello se puede seleccionar el distrito y pulsar el botón "Submit".
+    En esta página se muestra un listado con todos los museos existentes en la base de datos del sitio. Para cada museo se muestra el nombre y un enlace a la pagína del museo en el sitio.
+    Además en la parte derecha de la página se muestra un mapa de "Google Maps" con la localización de todos los museos que hay en la base de datos del sitio. Este mapa utiliza "JavaScript" para conectar con "Google Maps" y mostrar las localizaciones. Además de tener los correspondientes API's dados de alta en "Google APIS".</p>
+
+    <h4>Página "Mi Página"</h4>
+    <br><p>Esta página aparece cuando el visitante se encuentre logueado. Aparecerá en el menú, entre las opciones "Todos" y "About". Al pulsar sobre él, el sitio nos mostrará la página personal del usuario.
+    En esta página se muestran las opciones personales de cada usuario: el nombre, el tamaño de la letra, el color de fondo, y el título de su página.
+    Además, en las opciones "Color" y "Letra", en caso de acceder a la página personal como el propietario, se mostrará un formulario para modificar ambos campos. Otro formulario distinto aparecerá para la opción del "Título".
+    Más abajo se muestra el listado de museos marcados como favoritos por el usuario. Para cada museo se mostrará la misma información que en la página principal y también estarán listados de 5 en 5.</p>
+
+    <h4>Página "Museo"</h4>
+    <br><p>En esta página se muestran todas las características de cada museo que están guardadas en la base de datos. En la parte derecha se muestra la ubicación del museo en una mapa de "Google Maps". En parte inferior se muestran todos los comentarios que tiene el museo.
+    En el caso de estar logueado en el sitio, se mostrará un botón bajo el título "Ficha técnica" donde el usuario podrá agregar el museo a su lista de favoritos. Y en el apartado de comentarios se mostrará un formulario para dejar un comentario del museo.</p>
+
+</ul>
+{% endblock %}

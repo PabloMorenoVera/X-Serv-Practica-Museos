@@ -37,40 +37,35 @@
 						</form>
 					{% endif %}
 				</div>
+				<div id="register">
+					<form action="/register" method="GET">
+							<input type="submit" value="Registrar" class="submit">
+					</form>
+				</div>
 			</div>
-
 
 			<div id="headerpic"></div>
 
-
 			<div id="menu">
 				{% block menu %} {% endblock %}
-
-				<div id="search">
-					{% block boton_accesibles %} {% endblock %}
-					{% block distrito %}{% endblock %}
-				</div>
 			</div>
 			<div id="menubottom"></div>
 
-
 			<div id="content">
-
 				<!-- Normal content: Stuff that's not going to be put in the left or right column. -->
 				<div id="normalcontent">
 					<h1>{{ Titulo }}</h1>
 					<div class="contentarea">
 						<!-- Normal content area start -->
 						{% block cargar_bd %} {% endblock %}
+						{% block distrito %}{% endblock %}
 						{% block añadir %} {% endblock %}
 						{{ add }}
 						<!-- Normal content area end -->
 					</div>
 				</div>
 
-
 				<div class="divider1"></div>
-
 
 				<!-- Primary content: Stuff that goes in the primary content column (by default, the left column) -->
 				<div id="primarycontainer">
@@ -82,15 +77,15 @@
 						{% block usuario %} {% endblock %}
 						{% block Comentarios %} {% endblock%}
 						{% block Comentario %} {% endblock %}
+						{% block register %} {% endblock %}
+						{% block about %} {% endblock %}
 
 						<div id="pages">
 							<div class="post">
 								{% block pages%} {% endblock %}
-
 							</div>
 						</div>
 						<!-- Primary content area end -->
-
 					</div>
 				</div>
 
@@ -100,9 +95,7 @@
 					{% block map %} {% endblock %}
 					<!-- Secondary content area end -->
 				</div>
-
 				{% block paginas_personales %} {% endblock %}
-
 			</div>
 
 			<div id="footer">

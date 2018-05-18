@@ -4,6 +4,9 @@
 <ul>
 	<li><a href="/">Inicio</a></li>
 	<li><a href="/museos" class="active">Todos</a></li>
+	{% if user.is_authenticated %}
+		<li><a href="/{{user.get_username}}">Mi Página</a></li>
+	{% endif %}
 	<li><a href="/about">About</a></li>
 </ul>
 {% endblock %}
@@ -34,7 +37,7 @@
 <!-- API's settings from: https://churchthemes.com/page-didnt-load-google-maps-correctly/
 			and code from: https://www.w3schools.com/html/tryit.asp?filename=tryhtml_google_map_4 -->
 {% block map %}
-<div id="map" style="width:90%;height:50%;background:yellow"></div>
+<div id="map" style="width:90%;height:50%;background:white"></div>
 <script>
 var map;
 function myMap() {

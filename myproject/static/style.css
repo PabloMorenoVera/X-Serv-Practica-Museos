@@ -261,27 +261,15 @@ color: #F2F3DE;
 vertical-align: middle;
 }
 
-#search
+#register
 {
 position: absolute;
-top: 1.0em;
-right: 2.0em;
+top: 7em;
+right: 1em;
 padding-right: 0.0em;
 }
 
-#search input.text
-{
-margin-right: 0.5em;
-vertical-align: middle;
-border-top: solid 1px #000000;
-border-right: 0px;
-border-bottom: solid 1px #777777;
-border-left: 0px;
-padding: 0.15em;
-width: 10.0em;
-}
-
-#search input.submit
+#register input.submit
 {
 background: #939B00 url('images/buttonbg.gif') repeat-x;
 border: solid 1px #5F6800;
